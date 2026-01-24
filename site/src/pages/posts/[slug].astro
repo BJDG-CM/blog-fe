@@ -3,6 +3,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PrivatePost from '../../components/PrivatePost';
 import { loadPosts, renderPostHtml } from '../../utils/posts';
 
+export function getStaticPaths() {
+  const posts = loadPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug }
+  }));
+}
+
 const posts = loadPosts();
 const { slug } = Astro.params;
 const post = posts.find((item) => item.slug === slug);

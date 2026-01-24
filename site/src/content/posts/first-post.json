@@ -1,0 +1,67 @@
+{
+  "slug": "first-post",
+  "meta": {
+    "title": "첫 번째 포스트 - 에디터 데모",
+    "date": "2024-06-01",
+    "tags": ["demo", "tiptap"],
+    "summary": "표, 색상, 정렬, 수식, 이미지까지 보여주는 예시 포스트입니다.",
+    "draft": false
+  },
+  "doc": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "heading",
+        "attrs": { "level": 2 },
+        "content": [{ "type": "text", "text": "풍부한 편집 기능" }]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          { "type": "text", "text": "색상 " },
+          { "type": "text", "text": "변경", "marks": [{ "type": "textStyle", "attrs": { "color": "#ef4444" } }] },
+          { "type": "text", "text": "과 " },
+          { "type": "text", "text": "볼드", "marks": [{ "type": "bold" }] },
+          { "type": "text", "text": " 텍스트를 확인하세요." }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "attrs": { "textAlign": "center" },
+        "content": [{ "type": "text", "text": "가운데 정렬된 문장" }]
+      },
+      {
+        "type": "table",
+        "content": [
+          {
+            "type": "tableRow",
+            "content": [
+              { "type": "tableHeader", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "기능" }] }] },
+              { "type": "tableHeader", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "설명" }] }] }
+            ]
+          },
+          {
+            "type": "tableRow",
+            "content": [
+              { "type": "tableCell", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "표" }] }] },
+              { "type": "tableCell", "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "행/열 편집 가능" }] }] }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          { "type": "text", "text": "수식 예시: $E = mc^2$" }
+        ]
+      },
+      {
+        "type": "image",
+        "attrs": {
+          "src": "/uploads/first-post/sample.svg",
+          "alt": "샘플 이미지"
+        }
+      }
+    ]
+  }
+}

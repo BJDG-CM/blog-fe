@@ -1,0 +1,91 @@
+body {
+  margin: 0;
+  font-family: 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+header {
+  padding: 1rem 1.5rem;
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  padding: 1rem;
+  border-right: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.editor-area {
+  padding: 1.5rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.editor-content {
+  border: 1px solid #cbd5f5;
+  border-radius: 12px;
+  padding: 1rem;
+  min-height: 420px;
+  background: white;
+}
+
+button {
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: white;
+  color: #0f172a;
+  border: 1px solid #94a3b8;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  padding: 0.4rem;
+  border-radius: 6px;
+  border: 1px solid #cbd5f5;
+}
+
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.post-list button {
+  text-align: left;
+}
+
+.preview {
+  border: 1px solid #cbd5f5;
+  border-radius: 12px;
+  padding: 1rem;
+  background: white;
+}
+
+.notice {
+  background: #eff6ff;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}

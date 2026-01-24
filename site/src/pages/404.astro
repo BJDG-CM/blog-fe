@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const base = Astro.base;
+---
+<BaseLayout title="404">
+  <div class="card">
+    <h1>페이지를 찾을 수 없습니다.</h1>
+    <a href={base}>홈으로 이동</a>
+  </div>
+</BaseLayout>

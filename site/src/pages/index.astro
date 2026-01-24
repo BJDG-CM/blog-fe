@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Search from '../components/Search';
+import { loadPosts, renderPostHtml } from '../utils/posts';
+const posts = loadPosts();
+const privateMode = import.meta.env.PUBLIC_PRIVATE_MODE === 'true';
+const searchItems = posts.map((post) => ({
+  slug: post.slug,
+  title: post.meta.title,
+  summary: post.meta.summary,
+  tags: post.meta.tags
+}));
+const base = Astro.base;
+---
+<BaseLayout title="나의 블로그">
+  <section class="notice">
+    <strong>모드:</strong> {privateMode ? '프라이빗(암호화)' : '기본(공개)'}
+  </section>
+  <Search client:load items={searchItems} />
+  <section class="card-grid">
+    {posts.map((post) => (
+      <article class="card" key={post.slug}>
+        <h2><a href={`${base}posts/${post.slug}`}>{post.meta.title}</a></h2>
+        <p>{post.meta.summary}</p>
+        <small>{post.meta.date}</small>
+        {!privateMode && (
+          <div class="post-content" set:html={renderPostHtml(post)} />
+        )}
+      </article>
+    ))}
+  </section>
+</BaseLayout>

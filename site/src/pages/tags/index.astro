@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { loadPosts } from '../../utils/posts';
+const posts = loadPosts();
+const tags = [...new Set(posts.flatMap((post) => post.meta.tags))].sort();
+const base = Astro.base;
+---
+<BaseLayout title="태그">
+  <div class="card">
+    <h1>태그</h1>
+    <ul>
+      {tags.map((tag) => (
+        <li><a href={`${base}tags/${tag}`}>{tag}</a></li>
+      ))}
+    </ul>
+  </div>
+</BaseLayout>

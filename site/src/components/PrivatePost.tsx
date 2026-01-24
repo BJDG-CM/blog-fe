@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
-import DOMPurify from 'dompurify';
 import katex from 'katex';
 import type { EncryptedPayload } from '../utils/crypto';
 import { decryptJson } from '../utils/crypto';
+import { sanitizeHtml } from '../utils/sanitize';
 import { renderTiptapToHtml } from '../utils/tiptap';
 
 const storageKey = 'blog-passphrase';
@@ -32,7 +32,7 @@ export default function PrivatePost({ payload }: { payload: EncryptedPayload }) 
       const doc = await decryptJson(passphrase, payload);
       const rendered = renderTiptapToHtml(doc as Record<string, unknown>);
       const withMath = renderMath(rendered);
-      setHtml(DOMPurify.sanitize(withMath));
+      setHtml(sanitizeHtml(withMath));
       setError('');
       if (remember) {
         localStorage.setItem(storageKey, passphrase);

@@ -2,6 +2,17 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { loadPosts } from '../../utils/posts';
 
+export function getStaticPaths() {
+  const tags = new Set<string>();
+  loadPosts().forEach((post) => {
+    post.meta.tags.forEach((entry) => tags.add(entry));
+  });
+
+  return Array.from(tags).map((entry) => ({
+    params: { tag: entry }
+  }));
+}
+
 const { tag } = Astro.params;
 const posts = loadPosts().filter((post) => post.meta.tags.includes(tag ?? ''));
 const base = Astro.base;

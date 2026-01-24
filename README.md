@@ -7,7 +7,7 @@
 ```
 /site        # 배포 대상 Astro 정적 사이트
 /authoring   # 로컬 작성 UI + 로컬 파일 저장 서버
-/.github     # GitHub Actions 워크플로
+/.github     # GitHub Actions 워크플로우
 ```
 
 ## 요구사항
@@ -35,7 +35,7 @@ npm run dev      # 사이트 개발 서버 (http://localhost:4321)
 - 방문자는 패스프레이즈를 입력해 복호화합니다.
 - **주의:** 정적 사이트의 완전한 접근통제는 불가능하며, 평문 노출 방지를 위한 보호용입니다.
 
-## 작성 워크플로
+## 작성 워크플로우
 
 1. `npm run author` 로 작성 UI 실행
 2. 글 작성/이미지 첨부 → 자동 저장

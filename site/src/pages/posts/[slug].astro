@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PrivatePost from '../../components/PrivatePost';
+import { loadPosts, renderPostHtml } from '../../utils/posts';
+
+const posts = loadPosts();
+const { slug } = Astro.params;
+const post = posts.find((item) => item.slug === slug);
+if (!post) {
+  throw new Error('Post not found');
+}
+
+const privateMode = import.meta.env.PUBLIC_PRIVATE_MODE === 'true';
+const html = renderPostHtml(post);
+---
+<BaseLayout title={post.meta.title}>
+  <article class="card">
+    <h1>{post.meta.title}</h1>
+    <small>{post.meta.date}</small>
+    <div style={{ marginTop: '1rem' }}>
+      {privateMode && post.encrypted ? (
+        <PrivatePost client:load payload={post.encrypted} />
+      ) : (
+        <div class="post-content" set:html={html} />
+      )}
+    </div>
+  </article>
+</BaseLayout>

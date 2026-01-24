@@ -10,6 +10,8 @@
 /.github     # GitHub Actions 워크플로우
 ```
 
+> 이 레포는 Git 서브모듈을 사용하지 않습니다.
+
 ## 요구사항
 
 - Node 20+

@@ -1,6 +1,6 @@
 # 개인 블로그 (GitHub Pages + Astro + Tiptap)
 
-이 레포는 **정적 블로그 사이트(/site)** 와 **로컬 전용 작성도구(/authoring)** 로 구성됩니다. 작성도구에서 글과 이미지를 저장하면 `/site` 콘텐츠에 파일로 저장되고, `main` 브랜치에 push 되면 GitHub Actions가 자동 배포합니다.
+이 레포는 **정적 블로그 사이트(/site)** 와 **로컬 전용 작성도구(/authoring)** 로 구성됩니다. 작성도구에서 글과 이미지를 저장하면 `/site` 콘텐츠에 파일로 저장되며, `main` 브랜치에 push 되면 GitHub Actions가 자동 배포합니다.
 
 ## 폴더 구조
 

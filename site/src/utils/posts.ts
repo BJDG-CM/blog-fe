@@ -1,7 +1,7 @@
-import DOMPurify from 'dompurify';
 import katex from 'katex';
 import { renderTiptapToHtml } from './tiptap';
 import type { EncryptedPayload } from './crypto';
+import { sanitizeHtml } from './sanitize';
 
 export type PostMeta = {
   title: string;
@@ -66,5 +66,5 @@ export function renderPostHtml(post: PostEntry): string {
   }
   const rawHtml = renderTiptapToHtml(post.doc);
   const withMath = renderMath(rawHtml);
-  return DOMPurify.sanitize(withMath);
+  return sanitizeHtml(withMath);
 }

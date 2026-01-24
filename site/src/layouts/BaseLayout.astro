@@ -1,0 +1,29 @@
+---
+import ThemeToggle from '../components/ThemeToggle';
+import '../styles/global.css';
+const { title } = Astro.props;
+const base = Astro.base;
+---
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  </head>
+  <body>
+    <header>
+      <a href={base}>나의 블로그</a>
+      <div>
+        <a href={`${base}tags`}>태그</a>
+        <span style="margin-left: 1rem;">
+          <ThemeToggle client:load />
+        </span>
+      </div>
+    </header>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

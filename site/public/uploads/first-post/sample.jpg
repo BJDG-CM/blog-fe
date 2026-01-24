@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="샘플 이미지">
+  <rect width="640" height="360" fill="#1e293b" />
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-size="20" font-family="Pretendard, 'Noto Sans KR', sans-serif">
+    텍스트 대체 이미지
+  </text>
+</svg>

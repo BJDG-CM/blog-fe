@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { loadPosts } from '../../utils/posts';
+
+const { tag } = Astro.params;
+const posts = loadPosts().filter((post) => post.meta.tags.includes(tag ?? ''));
+const base = Astro.base;
+---
+<BaseLayout title={`태그: ${tag}`}>
+  <div class="card">
+    <h1>태그: {tag}</h1>
+    <ul>
+      {posts.map((post) => (
+        <li><a href={`${base}posts/${post.slug}`}>{post.meta.title}</a></li>
+      ))}
+    </ul>
+  </div>
+</BaseLayout>

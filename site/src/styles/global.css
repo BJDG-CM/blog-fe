@@ -37,21 +37,6 @@ body {
   line-height: 1.7;
 }
 
-.skip-link {
-  position: absolute;
-  left: -999px;
-  top: 16px;
-  background: var(--accent);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-pill);
-  z-index: 10;
-}
-
-.skip-link:focus {
-  left: 16px;
-}
-
 a {
   color: inherit;
   text-decoration: none;
@@ -290,27 +275,6 @@ main {
   color: var(--muted);
 }
 
-.search-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.search-hint {
-  margin: 0.35rem 0 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.search-count {
-  font-size: 0.85rem;
-  color: var(--muted);
-  background: rgba(194, 106, 69, 0.12);
-  padding: 0.35rem 0.75rem;
-  border-radius: var(--radius-pill);
-}
-
 .search-input {
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
@@ -327,11 +291,6 @@ main {
   gap: 0.5rem;
 }
 
-.search-empty {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
 .notice {
   background: rgba(194, 106, 69, 0.12);
   border-radius: var(--radius-md);
@@ -346,42 +305,6 @@ main {
   border: 1px solid var(--border);
   padding: 2.5rem;
   box-shadow: var(--shadow);
-}
-
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.tag-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 1rem 0 0;
-}
-
-.tag-pill {
-  padding: 0.35rem 0.9rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border);
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-
-.page-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: center;
-  margin-top: 1.5rem;
-}
-
-.link-muted {
-  color: var(--muted);
-  font-size: 0.9rem;
 }
 
 .post-body h1 {
@@ -411,18 +334,6 @@ footer {
   border-top: 1px solid var(--border);
   padding: 2.5rem 1.5rem 3rem;
   color: var(--muted);
-}
-
-.footer-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-  gap: 2rem;
-}
-
-.footer-links {
-  display: grid;
-  gap: 0.5rem;
-  justify-items: start;
 }
 
 input,
@@ -458,9 +369,5 @@ button.secondary {
 
   .nav {
     gap: 1rem;
-  }
-
-  .footer-grid {
-    grid-template-columns: 1fr;
   }
 }

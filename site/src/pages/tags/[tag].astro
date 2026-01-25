@@ -30,8 +30,6 @@ const base = Astro.base;
             <span>{post.meta.tags[0] ?? 'Essay'}</span>
             <span>•</span>
             <span>{post.meta.date}</span>
-            <span>•</span>
-            <span>{getPostStats(post).readingTime}</span>
           </div>
           <h3 class="post-title">
             <a href={`${base}posts/${post.slug}`}>{post.meta.title}</a>

@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Search from '../components/Search';
-import { getPostStats, loadPosts } from '../utils/posts';
+import { loadPosts } from '../utils/posts';
 
 const posts = loadPosts();
 const privateMode = import.meta.env.PUBLIC_PRIVATE_MODE === 'true';
@@ -12,7 +12,6 @@ const searchItems = posts.map((post) => ({
   tags: post.meta.tags
 }));
 const tags = [...new Set(posts.flatMap((post) => post.meta.tags))].sort();
-const featuredPost = posts[0];
 const base = Astro.base;
 ---
 <BaseLayout title="Clarity Journal">
@@ -68,8 +67,6 @@ const base = Astro.base;
             <span>{post.meta.tags[0] ?? 'Essay'}</span>
             <span>•</span>
             <span>{post.meta.date}</span>
-            <span>•</span>
-            <span>{getPostStats(post).readingTime}</span>
           </div>
           <h3 class="post-title">
             <a href={`${base}posts/${post.slug}`}>{post.meta.title}</a>
@@ -80,30 +77,6 @@ const base = Astro.base;
       ))}
     </div>
   </section>
-
-  {featuredPost && (
-    <section class="section">
-      <div>
-        <h2>Featured reading</h2>
-        <p>한 편의 글을 골라 차분히 읽을 수 있도록 정리했습니다.</p>
-      </div>
-      <article class="post-body">
-        <div class="post-meta">
-          <span>{featuredPost.meta.tags[0] ?? 'Essay'}</span>
-          <span>•</span>
-          <span>{featuredPost.meta.date}</span>
-          <span>•</span>
-          <span>{getPostStats(featuredPost).readingTime}</span>
-        </div>
-        <h3 class="post-title">{featuredPost.meta.title}</h3>
-        <p class="post-summary">{featuredPost.meta.summary}</p>
-        <div class="page-actions">
-          <a class="button" href={`${base}posts/${featuredPost.slug}`}>Read the full post</a>
-          <a class="link-muted" href={`${base}tags/${featuredPost.meta.tags[0] ?? ''}`}>Explore related tags</a>
-        </div>
-      </article>
-    </section>
-  )}
 
   <section class="section" id="about">
     <div>

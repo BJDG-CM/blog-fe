@@ -29,13 +29,7 @@ export default function Search({ items }: { items: SearchItem[] }) {
 
   return (
     <section className="search-panel" aria-labelledby="search-title">
-      <div className="search-header">
-        <div>
-          <h2 id="search-title">Search</h2>
-          <p className="search-hint">제목, 요약, 태그로 빠르게 찾아보세요.</p>
-        </div>
-        <span className="search-count">{results.length} results</span>
-      </div>
+      <h2 id="search-title">Search</h2>
       <label htmlFor="search-input">검색어</label>
       <input
         id="search-input"
@@ -47,15 +41,11 @@ export default function Search({ items }: { items: SearchItem[] }) {
         aria-label="검색어 입력"
       />
       <ul className="search-results">
-        {results.length ? (
-          results.map((item) => (
-            <li key={item.slug}>
-              <a href={`${base}posts/${item.slug}`}>{item.title}</a>
-            </li>
-          ))
-        ) : (
-          <li className="search-empty">검색 결과가 없습니다.</li>
-        )}
+        {results.map((item) => (
+          <li key={item.slug}>
+            <a href={`${base}posts/${item.slug}`}>{item.title}</a>
+          </li>
+        ))}
       </ul>
     </section>
   );

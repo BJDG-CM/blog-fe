@@ -68,3 +68,21 @@ export function renderPostHtml(post: PostEntry): string {
   const withMath = renderMath(rawHtml);
   return sanitizeHtml(withMath);
 }
+
+function stripHtml(html: string) {
+  return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+export function getPostStats(post: PostEntry) {
+  const rawHtml = renderTiptapToHtml(post.doc);
+  const text = stripHtml(rawHtml) || post.meta.summary || post.meta.title;
+  const wordCount = text ? text.split(/\s+/).filter(Boolean).length : 0;
+  const fallbackCount = Math.ceil(text.replace(/\s+/g, '').length / 2);
+  const total = wordCount || fallbackCount;
+  const minutes = Math.max(1, Math.ceil(total / 200));
+
+  return {
+    readingTime: `${minutes} min read`,
+    wordCount: total
+  };
+}

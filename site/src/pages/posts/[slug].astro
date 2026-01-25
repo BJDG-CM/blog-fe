@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PrivatePost from '../../components/PrivatePost';
-import { loadPosts, renderPostHtml } from '../../utils/posts';
+import { getPostStats, loadPosts, renderPostHtml } from '../../utils/posts';
 
 export function getStaticPaths() {
   const posts = loadPosts();

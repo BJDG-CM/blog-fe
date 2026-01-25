@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { loadPosts } from '../../utils/posts';
+import { getPostStats, loadPosts } from '../../utils/posts';
 
 export function getStaticPaths() {
   const tags = new Set<string>();

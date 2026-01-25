@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Search from '../components/Search';
-import { loadPosts, renderPostHtml } from '../utils/posts';
+import { getPostStats, loadPosts } from '../utils/posts';
+
 const posts = loadPosts();
 const privateMode = import.meta.env.PUBLIC_PRIVATE_MODE === 'true';
 const searchItems = posts.map((post) => ({
@@ -10,23 +11,107 @@ const searchItems = posts.map((post) => ({
   summary: post.meta.summary,
   tags: post.meta.tags
 }));
+const tags = [...new Set(posts.flatMap((post) => post.meta.tags))].sort();
+const featuredPost = posts[0];
 const base = Astro.base;
 ---
-<BaseLayout title="나의 블로그">
+<BaseLayout title="Clarity Journal">
   <section class="notice">
     <strong>모드:</strong> {privateMode ? '프라이빗(암호화)' : '기본(공개)'}
   </section>
-  <Search client:load items={searchItems} />
-  <section class="card-grid">
-    {posts.map((post) => (
-      <article class="card" key={post.slug}>
-        <h2><a href={`${base}posts/${post.slug}`}>{post.meta.title}</a></h2>
-        <p>{post.meta.summary}</p>
-        <small>{post.meta.date}</small>
-        {!privateMode && (
-          <div class="post-content" set:html={renderPostHtml(post)} />
-        )}
+
+  <section class="hero">
+    <div>
+      <span class="hero-eyebrow">Personal blog</span>
+      <h1>느린 리듬을 위한 미니멀한 글쓰기 공간.</h1>
+      <p>
+        군더더기 없는 레이아웃과 한 가지 포인트 컬러로 읽기 쉬운 콘텐츠를 만들었습니다.
+        디자인, 글쓰기, 집중을 돕는 습관을 함께 공유합니다.
+      </p>
+      <Search client:load items={searchItems} />
+    </div>
+    <aside class="hero-card">
+      <h2>Weekly ritual</h2>
+      <p>짧은 에세이, 읽을거리, 실천 가능한 아이디어를 매주 전합니다.</p>
+      <div class="hero-stat">
+        <span>Subscribers</span>
+        <strong>12.4k</strong>
+      </div>
+      <div class="hero-stat">
+        <span>Avg. open rate</span>
+        <strong>58%</strong>
+      </div>
+    </aside>
+  </section>
+
+  <section class="section" id="categories">
+    <div>
+      <h2>Browse by category</h2>
+      <p>관심 있는 태그를 선택해 읽을거리를 모아보세요.</p>
+    </div>
+    <div class="filters">
+      {tags.map((tag) => (
+        <a class="chip" href={`${base}tags/${tag}`}>{tag}</a>
+      ))}
+    </div>
+  </section>
+
+  <section class="section" id="posts">
+    <div>
+      <h2>Latest posts</h2>
+      <p>카드를 선택하면 각 글의 전체 페이지로 이동합니다.</p>
+    </div>
+    <div class="card-grid">
+      {posts.map((post) => (
+        <article class="post-card">
+          <div class="post-meta">
+            <span>{post.meta.tags[0] ?? 'Essay'}</span>
+            <span>•</span>
+            <span>{post.meta.date}</span>
+            <span>•</span>
+            <span>{getPostStats(post).readingTime}</span>
+          </div>
+          <h3 class="post-title">
+            <a href={`${base}posts/${post.slug}`}>{post.meta.title}</a>
+          </h3>
+          <p class="post-summary">{post.meta.summary}</p>
+          <a class="button" href={`${base}posts/${post.slug}`}>Read post</a>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  {featuredPost && (
+    <section class="section">
+      <div>
+        <h2>Featured reading</h2>
+        <p>한 편의 글을 골라 차분히 읽을 수 있도록 정리했습니다.</p>
+      </div>
+      <article class="post-body">
+        <div class="post-meta">
+          <span>{featuredPost.meta.tags[0] ?? 'Essay'}</span>
+          <span>•</span>
+          <span>{featuredPost.meta.date}</span>
+          <span>•</span>
+          <span>{getPostStats(featuredPost).readingTime}</span>
+        </div>
+        <h3 class="post-title">{featuredPost.meta.title}</h3>
+        <p class="post-summary">{featuredPost.meta.summary}</p>
+        <div class="page-actions">
+          <a class="button" href={`${base}posts/${featuredPost.slug}`}>Read the full post</a>
+          <a class="link-muted" href={`${base}tags/${featuredPost.meta.tags[0] ?? ''}`}>Explore related tags</a>
+        </div>
       </article>
-    ))}
+    </section>
+  )}
+
+  <section class="section" id="about">
+    <div>
+      <h2>About the author</h2>
+      <p>
+        인터페이스 디자이너이자 글쓰기를 사랑하는 Mira입니다. 느리게 읽히는 화면과
+        차분한 리듬을 만들어가는 과정을 기록합니다.
+      </p>
+    </div>
   </section>
 </BaseLayout>

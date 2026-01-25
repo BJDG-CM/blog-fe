@@ -13,17 +13,39 @@ const base = Astro.base;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
   </head>
   <body>
-    <header>
-      <a href={base}>나의 블로그</a>
-      <div>
-        <a href={`${base}tags`}>태그</a>
-        <span style="margin-left: 1rem;">
-          <ThemeToggle client:load />
-        </span>
+    <a class="skip-link" href="#main">본문 바로가기</a>
+    <header class="site-header">
+      <div class="brand">
+        <a class="brand-title" href={base}>Clarity Journal</a>
+        <span class="brand-subtitle">디자인과 느린 글쓰기를 기록하는 블로그</span>
       </div>
+      <nav class="nav" aria-label="Primary">
+        <a href={`${base}#posts`}>Posts</a>
+        <a href={`${base}#categories`}>Categories</a>
+        <a href={`${base}tags`}>Tags</a>
+        <a href={`${base}#about`}>About</a>
+        <ThemeToggle client:load />
+      </nav>
     </header>
-    <main>
-      <slot />
+    <main id="main">
+      <div class="container">
+        <slot />
+      </div>
     </main>
+    <footer>
+      <div class="container footer-grid">
+        <div>
+          <strong>Stay in touch</strong>
+          <p>디자인과 글쓰기, 차분한 생산성에 대한 노트를 월 1회 공유합니다.</p>
+          <p>Email: hello@clarityjournal.com</p>
+        </div>
+        <div class="footer-links">
+          <a href={`${base}#posts`}>Posts</a>
+          <a href={`${base}tags`}>Tags</a>
+          <a href={`${base}#about`}>About</a>
+          <a href="#main">Back to top</a>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>

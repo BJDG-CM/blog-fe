@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { loadPosts } from '../../utils/posts';
+import { getPostStats, loadPosts } from '../../utils/posts';
 
 export function getStaticPaths() {
   const tags = new Set<string>();
@@ -18,12 +18,28 @@ const posts = loadPosts().filter((post) => post.meta.tags.includes(tag ?? ''));
 const base = Astro.base;
 ---
 <BaseLayout title={`태그: ${tag}`}>
-  <div class="card">
-    <h1>태그: {tag}</h1>
-    <ul>
+  <section class="section">
+    <div>
+      <h2>Tag: {tag}</h2>
+      <p>{posts.length}개의 글이 있습니다.</p>
+    </div>
+    <div class="card-grid">
       {posts.map((post) => (
-        <li><a href={`${base}posts/${post.slug}`}>{post.meta.title}</a></li>
+        <article class="post-card">
+          <div class="post-meta">
+            <span>{post.meta.tags[0] ?? 'Essay'}</span>
+            <span>•</span>
+            <span>{post.meta.date}</span>
+            <span>•</span>
+            <span>{getPostStats(post).readingTime}</span>
+          </div>
+          <h3 class="post-title">
+            <a href={`${base}posts/${post.slug}`}>{post.meta.title}</a>
+          </h3>
+          <p class="post-summary">{post.meta.summary}</p>
+          <a class="button" href={`${base}posts/${post.slug}`}>Read post</a>
+        </article>
       ))}
-    </ul>
-  </div>
+    </div>
+  </section>
 </BaseLayout>

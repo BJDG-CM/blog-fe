@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PrivatePost from '../../components/PrivatePost';
-import { loadPosts, renderPostHtml } from '../../utils/posts';
+import { getPostStats, loadPosts, renderPostHtml } from '../../utils/posts';
 
 export function getStaticPaths() {
   const posts = loadPosts();
@@ -21,10 +21,23 @@ const privateMode = import.meta.env.PUBLIC_PRIVATE_MODE === 'true';
 const html = renderPostHtml(post);
 ---
 <BaseLayout title={post.meta.title}>
-  <article class="card">
+  <article class="post-body">
+    <a class="back-link" href={`${Astro.base}#posts`}>← Back to posts</a>
+    <div class="post-meta">
+      <span>{post.meta.tags[0] ?? 'Essay'}</span>
+      <span>•</span>
+      <span>{post.meta.date}</span>
+      <span>•</span>
+      <span>{getPostStats(post).readingTime}</span>
+    </div>
     <h1>{post.meta.title}</h1>
-    <small>{post.meta.date}</small>
-    <div style={{ marginTop: '1rem' }}>
+    <p class="post-summary">{post.meta.summary}</p>
+    <div class="tag-list">
+      {post.meta.tags.map((tag) => (
+        <a class="tag-pill" href={`${Astro.base}tags/${tag}`}>{tag}</a>
+      ))}
+    </div>
+    <div style={{ marginTop: '1.5rem' }}>
       {privateMode && post.encrypted ? (
         <PrivatePost client:load payload={post.encrypted} />
       ) : (

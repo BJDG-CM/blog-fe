@@ -6,12 +6,15 @@ const tags = [...new Set(posts.flatMap((post) => post.meta.tags))].sort();
 const base = Astro.base;
 ---
 <BaseLayout title="태그">
-  <div class="card">
-    <h1>태그</h1>
-    <ul>
+  <section class="section">
+    <div>
+      <h2>Tags</h2>
+      <p>관심 있는 태그를 선택해 글을 모아보세요.</p>
+    </div>
+    <div class="filters">
       {tags.map((tag) => (
-        <li><a href={`${base}tags/${tag}`}>{tag}</a></li>
+        <a class="chip" href={`${base}tags/${tag}`}>{tag}</a>
       ))}
-    </ul>
-  </div>
+    </div>
+  </section>
 </BaseLayout>

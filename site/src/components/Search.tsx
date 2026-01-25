@@ -28,16 +28,19 @@ export default function Search({ items }: { items: SearchItem[] }) {
   }, [query, index, items]);
 
   return (
-    <section className="card" style={{ marginBottom: '2rem' }}>
-      <h2>검색</h2>
+    <section className="search-panel" aria-labelledby="search-title">
+      <h2 id="search-title">Search</h2>
+      <label htmlFor="search-input">검색어</label>
       <input
+        id="search-input"
+        className="search-input"
         type="search"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        placeholder="검색어 입력"
+        placeholder="제목 또는 태그로 검색"
         aria-label="검색어 입력"
       />
-      <ul>
+      <ul className="search-results">
         {results.map((item) => (
           <li key={item.slug}>
             <a href={`${base}posts/${item.slug}`}>{item.title}</a>

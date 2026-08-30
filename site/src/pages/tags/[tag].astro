@@ -2,8 +2,16 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { loadPosts } from '../../utils/posts';
 
-const { tag } = Astro.params;
-const posts = loadPosts().filter((post) => post.meta.tags.includes(tag ?? ''));
+export function getStaticPaths() {
+  const posts = loadPosts();
+  const tags = [...new Set(posts.flatMap((post) => post.meta.tags))];
+  return tags.map((tag) => ({
+    params: { tag },
+    props: { tag, posts: posts.filter((post) => post.meta.tags.includes(tag)) }
+  }));
+}
+
+const { tag, posts } = Astro.props;
 const base = Astro.base;
 ---
 <BaseLayout title={`태그: ${tag}`}>

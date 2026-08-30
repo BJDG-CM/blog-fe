@@ -26,7 +26,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: node .yarn/releases/yarn-3.3.1.cjs install --immutable
+        run: node .yarn/releases/yarn-3.3.1.cjs install --no-immutable
 
       - name: Build site
         env:

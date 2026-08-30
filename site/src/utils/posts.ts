@@ -1,4 +1,4 @@
-import DOMPurify from 'dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import katex from 'katex';
 import { renderTiptapToHtml } from './tiptap';
 import type { EncryptedPayload } from './crypto';

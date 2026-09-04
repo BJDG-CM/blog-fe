@@ -1,12 +1,25 @@
-# 개인 블로그 (GitHub Pages + Astro + Tiptap)
+# 개인 블로그 (Astro + Tiptap)
 
-이 레포는 **정적 블로그 사이트(/site)** 와 **로컬 전용 작성도구(/authoring)** 로 구성됩니다. 작성도구에서 글과 이미지를 저장하면 `/site` 콘텐츠에 파일로 저장되고, `main` 브랜치에 push 되면 GitHub Actions가 자동 배포합니다.
+**https://blog.yejunlee.com**
+
+정적 블로그 사이트(`/site`)와 로컬 작성도구(`/authoring`)로 구성됩니다.
+글은 `site/src/content/posts/*.json` 에 파일로 저장되고, `master` 에 push 되면
+자동으로 빌드·배포됩니다. 데이터베이스는 없고 저장소가 곧 콘텐츠 저장소입니다.
+
+글을 쓰는 방법은 두 가지입니다.
+
+- **사이트에서 바로** — `/admin` 에서 편집하고 저장하면 저장소에 커밋됩니다.
+  Cloudflare Access 로 잠겨 있어 본문은 누구나 읽지만 편집은 로그인이 필요합니다.
+  설정 절차는 [docs/cloudflare-setup.md](docs/cloudflare-setup.md) 를 보세요.
+- **로컬 작성도구** — `yarn author` 로 띄워 파일로 저장한 뒤 직접 커밋합니다.
 
 ## 폴더 구조
 
 ```
 /site        # 배포 대상 Astro 정적 사이트
 /authoring   # 로컬 작성 UI + 로컬 파일 저장 서버
+/functions   # Cloudflare Pages Functions (사이트 편집 API)
+/lib         # Functions 가 쓰는 공용 모듈 (인증 · GitHub · 입력 검증)
 /.github     # GitHub Actions 워크플로우
 ```
 
@@ -39,6 +52,7 @@
 | `/tags/[tag]`   | 태그별 글                             |
 | `/archive`      | 연도별 아카이브                       |
 | `/about`        | 소개                                  |
+| `/admin`        | 글 쓰기 (Cloudflare Access 로 잠금)   |
 
 사이트 이름·소개·메뉴·소셜 링크는 [`site/src/config.ts`](site/src/config.ts) 한 곳에서
 관리합니다.
@@ -59,25 +73,29 @@
 
 ## 요구사항
 
-- Node 20+
-- npm 사용
+- Node 22+
+- Yarn 3 (저장소에 포함되어 있어 Corepack 이 자동으로 씁니다)
 
 ## 실행 방법
 
 ```bash
-npm install
-npm run author   # 작성 UI + 로컬 서버 (http://localhost:5174)
-npm run dev      # 사이트 개발 서버 (http://localhost:4321)
-npm run build    # 정적 빌드 (site/dist)
-npm run lint     # ESLint
-npm test         # Vitest
+yarn install
+yarn author      # 작성 UI + 로컬 서버 (http://localhost:5174)
+yarn dev         # 사이트 개발 서버 (http://localhost:4321)
+yarn build       # 정적 빌드 (site/dist)
+yarn lint        # ESLint
+yarn typecheck   # 사이트 + Functions 타입 검사
+yarn test        # Vitest
 ```
 
-## 배포 설정 (GitHub Pages)
+## 배포
 
-1. Repo Settings → Pages → Source: **GitHub Actions** 선택
-2. `PRIVATE_PASSPHRASE`(프라이빗 모드 암호) 를 GitHub Secrets에 등록
-3. 필요 시 `PRIVATE_MODE` 변수를 `true` 로 설정 (Repository → Settings → Environments → Variables)
+`blog.yejunlee.com` 은 Cloudflare Pages 가 `master` 를 빌드해 배포합니다.
+빌드 설정과 편집 API 에 필요한 환경 변수, Cloudflare Access 정책은
+[docs/cloudflare-setup.md](docs/cloudflare-setup.md) 에 정리해 두었습니다.
+
+`.github/workflows/deploy.yml` 은 기존 `yejunlee.com/blog-fe/` 를 유지하기 위해
+남아 있습니다. 새 도메인이 안정되면 지워도 됩니다.
 
 ## 프라이빗 모드
 
@@ -87,9 +105,17 @@ npm test         # Vitest
 
 ## 작성 워크플로우
 
-1. `npm run author` 로 작성 UI 실행
-2. 글 작성/이미지 첨부 → 자동 저장
-3. `git add/commit/push` → GitHub Actions가 자동 배포
+**사이트에서 편집할 때**
+
+1. `/admin` 접속 → Cloudflare 로그인
+2. 글 작성/수정 후 저장 (⌘S)
+3. 저장소에 커밋되고 재빌드 → 1~3분 뒤 반영
+
+**로컬 작성도구를 쓸 때**
+
+1. `yarn author` 로 작성 UI 실행
+2. 글 작성/이미지 첨부 → 파일로 저장
+3. `git add/commit/push` → 자동 배포
 
 ## 라이선스
 

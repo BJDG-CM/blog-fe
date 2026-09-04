@@ -19,6 +19,8 @@ type Props = {
   tags?: string[];
   /** 글 상세처럼 상단 진행바가 필요한 페이지 */
   showProgress?: boolean;
+  /** 검색 엔진에서 감출 페이지 */
+  noindex?: boolean;
 };
 
 const {
@@ -29,6 +31,7 @@ const {
   updatedAt,
   tags = [],
   showProgress = false,
+  noindex = false,
 } = Astro.props;
 
 const searchIndex = buildSearchIndex();
@@ -61,6 +64,7 @@ const base = withBase('');
       publishedAt={publishedAt}
       updatedAt={updatedAt}
       tags={tags}
+      noindex={noindex}
     />
 
     <ViewTransitions />

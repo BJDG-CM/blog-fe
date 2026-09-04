@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Editor from '../components/admin/Editor';
+import '../styles/admin.css';
+---
+
+<BaseLayout
+  title="글 쓰기"
+  description="사이트에서 바로 글을 쓰고 고칩니다."
+  noindex
+>
+  <div class="container" style="max-width:1360px">
+    <div class="page-head" style="padding-block:28px 20px">
+      <h1 style="font-size:1.5rem">글 쓰기</h1>
+      <p>
+        저장하면 저장소에 커밋되고 사이트가 다시 빌드됩니다. 반영까지 보통
+        1~3분 걸립니다.
+      </p>
+    </div>
+
+    <div style="padding-bottom:64px">
+      <Editor client:only="react" />
+    </div>
+  </div>
+</BaseLayout>

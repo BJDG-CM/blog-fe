@@ -5,6 +5,9 @@ export async function GET(context: APIContext) {
   const body = [
     'User-agent: *',
     'Allow: /',
+    // 관리 화면과 편집 API는 색인 대상이 아니다.
+    'Disallow: /admin',
+    'Disallow: /api/',
     '',
     `Sitemap: ${absoluteUrl('sitemap.xml', context.site)}`,
     '',

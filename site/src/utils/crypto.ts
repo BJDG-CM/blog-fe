@@ -32,7 +32,8 @@ async function deriveKey(passphrase: string, salt: Uint8Array): Promise<CryptoKe
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt,
+      // lib.dom 은 BufferSource 의 backing buffer 가 ArrayBuffer 임을 요구한다.
+      salt: salt as BufferSource,
       iterations: 120000,
       hash: 'SHA-256'
     },

@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../config';
+import { withBase } from '../utils/url';
+import { getAllTags, loadPosts, postReadingTime } from '../utils/posts';
+
+const posts = loadPosts();
+const tags = getAllTags(posts);
+const totalMinutes = posts.reduce(
+  (total, post) => total + postReadingTime(post),
+  0,
+);
+---
+
+<BaseLayout title="소개" description={site.author.bio}>
+  <div class="container-prose">
+    <div class="page-head">
+      <h1>소개</h1>
+      <p>{site.description}</p>
+    </div>
+
+    <div style="padding-bottom:72px" class="stack">
+      <div class="about-card">
+        <div class="about-avatar" aria-hidden="true"></div>
+        <div style="min-width:0">
+          <h2 style="font-size:1.25rem">{site.author.name}</h2>
+          <p class="muted" style="margin-top:6px;font-size:0.9375rem">
+            {site.author.bio}
+          </p>
+          <div class="chip-row" style="margin-top:14px">
+            {
+              site.social.map((item) => (
+                <a class="tag" href={item.href} target="_blank" rel="noopener noreferrer">
+                  {item.label}
+                </a>
+              ))
+            }
+            <a class="tag" href={withBase('rss.xml')}>RSS</a>
+          </div>
+        </div>
+      </div>
+
+      <section style="margin-top:40px">
+        <div class="section-head">
+          <h2>이 블로그에 대하여</h2>
+        </div>
+        <div class="prose" style="font-size:1rem">
+          <p>
+            글은 로컬 작성도구(Tiptap 기반)에서 작성해 저장소에 파일로 커밋하고,
+            <code>main</code> 브랜치에 푸시하면 GitHub Actions가 정적 사이트를
+            빌드해 GitHub Pages로 배포합니다. 데이터베이스도, 서버도 없습니다.
+          </p>
+          <p>
+            검색은 빌드 시점에 만들어진 색인을 브라우저에서 직접 훑는 방식이라
+            네트워크 요청 없이 즉시 동작합니다. 필요할 때는 프라이빗 모드로
+            본문을 AES-GCM 암호화해 배포할 수도 있습니다.
+          </p>
+        </div>
+      </section>
+
+      <section style="margin-top:40px">
+        <div class="section-head">
+          <h2>기록 현황</h2>
+        </div>
+        <dl class="hero-stats" style="margin-top:0">
+          <div>
+            <dt>발행한 글</dt>
+            <dd>{posts.length}</dd>
+          </div>
+          <div>
+            <dt>태그</dt>
+            <dd>{tags.length}</dd>
+          </div>
+          <div>
+            <dt>총 읽기 분량</dt>
+            <dd>{totalMinutes}분</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section style="margin-top:40px">
+        <a class="btn btn-primary" href={withBase('posts')}>
+          글 보러 가기
+          <Icon name="arrowRight" size={16} />
+        </a>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

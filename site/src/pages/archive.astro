@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../utils/url';
+import { formatDateShort, isoDate } from '../utils/format';
+import {
+  groupPostsByYear,
+  loadPosts,
+  postReadingTime,
+} from '../utils/posts';
+
+const posts = loadPosts();
+const groups = groupPostsByYear(posts);
+---
+
+<BaseLayout
+  title="아카이브"
+  description="연도별로 모아 본 전체 글 목록."
+>
+  <div class="container-prose">
+    <div class="page-head">
+      <h1>아카이브</h1>
+      <p>{posts.length}편의 글을 발행한 순서대로 모아 두었습니다.</p>
+    </div>
+
+    <div style="padding-bottom:72px">
+      {
+        groups.length === 0 ? (
+          <div class="empty-state">
+            <strong>아직 기록이 없습니다.</strong>
+            <span>첫 글을 발행하면 이곳에 연도별로 쌓입니다.</span>
+          </div>
+        ) : (
+          <div class="timeline">
+            {groups.map(({ year, posts: yearPosts }) => (
+              <section class="year-block">
+                <h2>
+                  {year}
+                  <span class="n">{yearPosts.length}편</span>
+                </h2>
+
+                {yearPosts.map((post) => (
+                  <a class="archive-row" href={withBase(`posts/${post.slug}`)}>
+                    <time datetime={isoDate(post.meta.date)}>
+                      {formatDateShort(post.meta.date)}
+                    </time>
+                    <span class="t">{post.meta.title}</span>
+                    <span class="rt">{postReadingTime(post)}분</span>
+                  </a>
+                ))}
+              </section>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>

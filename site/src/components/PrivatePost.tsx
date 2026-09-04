@@ -1,74 +1,118 @@
-import { useMemo, useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import DOMPurify from 'dompurify';
 import katex from 'katex';
 import type { EncryptedPayload } from '../utils/crypto';
 import { decryptJson } from '../utils/crypto';
 import { renderTiptapToHtml } from '../utils/tiptap';
 
-const storageKey = 'blog-passphrase';
+const STORAGE_KEY = 'blog-passphrase';
 
 function renderMath(html: string) {
   let output = html;
-  output = output.replace(/\$\$([\s\S]+?)\$\$/g, (_, expr) => {
-    return katex.renderToString(expr.trim(), { displayMode: true, throwOnError: false });
-  });
-  output = output.replace(/\$([^$\n]+)\$/g, (_, expr) => {
-    return katex.renderToString(expr.trim(), { displayMode: false, throwOnError: false });
-  });
+  output = output.replace(/\$\$([\s\S]+?)\$\$/g, (_, expr) =>
+    katex.renderToString(expr.trim(), { displayMode: true, throwOnError: false }),
+  );
+  output = output.replace(/\$([^$\n]+)\$/g, (_, expr) =>
+    katex.renderToString(expr.trim(), {
+      displayMode: false,
+      throwOnError: false,
+    }),
+  );
   return output;
 }
 
 export default function PrivatePost({ payload }: { payload: EncryptedPayload }) {
-  const stored = typeof window !== 'undefined' ? localStorage.getItem(storageKey) ?? '' : '';
+  const stored =
+    typeof window !== 'undefined'
+      ? (localStorage.getItem(STORAGE_KEY) ?? '')
+      : '';
+
   const [passphrase, setPassphrase] = useState(stored);
   const [remember, setRemember] = useState(Boolean(stored));
   const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
   const [html, setHtml] = useState('');
 
-  const decrypted = useMemo(() => html, [html]);
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!passphrase || busy) return;
 
-  const handleDecrypt = async () => {
+    setBusy(true);
     try {
       const doc = await decryptJson(passphrase, payload);
       const rendered = renderTiptapToHtml(doc as Record<string, unknown>);
-      const withMath = renderMath(rendered);
-      setHtml(DOMPurify.sanitize(withMath));
+      setHtml(DOMPurify.sanitize(renderMath(rendered)));
       setError('');
-      if (remember) {
-        localStorage.setItem(storageKey, passphrase);
-      } else {
-        localStorage.removeItem(storageKey);
-      }
+
+      if (remember) localStorage.setItem(STORAGE_KEY, passphrase);
+      else localStorage.removeItem(STORAGE_KEY);
     } catch {
       setError('패스프레이즈가 올바르지 않습니다.');
+    } finally {
+      setBusy(false);
     }
   };
 
-  if (decrypted) {
-    return <div className="post-content" dangerouslySetInnerHTML={{ __html: decrypted }} />;
+  if (html) {
+    return <article className="prose" dangerouslySetInnerHTML={{ __html: html }} />;
   }
 
   return (
-    <section className="card">
-      <h2>비공개 글입니다</h2>
-      <p>정적 사이트의 완전한 접근통제는 불가하며, 이 방식은 콘텐츠 평문 노출 방지를 위한 클라이언트 측 암호화입니다.</p>
-      <div style={{ display: 'grid', gap: '0.75rem' }}>
+    <div className="private-gate">
+      <span className="lock" aria-hidden="true">
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <rect x="4.5" y="10.5" width="15" height="10" rx="2" />
+          <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" />
+        </svg>
+      </span>
+
+      <div>
+        <h2>비공개 글입니다</h2>
+        <p style={{ marginTop: 8 }}>
+          본문이 AES-GCM으로 암호화되어 있습니다. 패스프레이즈를 입력하면
+          브라우저에서 바로 복호화됩니다.
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit}>
         <input
           type="password"
           value={passphrase}
           onChange={(event) => setPassphrase(event.target.value)}
-          placeholder="패스프레이즈 입력"
-          aria-label="패스프레이즈 입력"
+          placeholder="패스프레이즈"
+          aria-label="패스프레이즈"
+          autoComplete="current-password"
         />
-        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} />
-          이 기기에서만 기억
+
+        <label className="row">
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(event) => setRemember(event.target.checked)}
+          />
+          이 기기에서만 기억하기
         </label>
-        <button type="button" onClick={handleDecrypt}>
-          복호화
+
+        <button type="submit" className="btn btn-primary" disabled={busy}>
+          {busy ? '복호화 중…' : '본문 열기'}
         </button>
-        {error && <p style={{ color: 'crimson' }}>{error}</p>}
-      </div>
-    </section>
+
+        {error && <p className="error">{error}</p>}
+      </form>
+
+      <p>
+        정적 사이트에서는 완전한 접근 통제가 불가능합니다. 평문 노출을 막기 위한
+        보호 수단으로만 사용하세요.
+      </p>
+    </div>
   );
 }

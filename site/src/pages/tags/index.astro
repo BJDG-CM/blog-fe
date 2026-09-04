@@ -1,17 +1,43 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { loadPosts } from '../../utils/posts';
+import { withBase } from '../../utils/url';
+import { getAllTags, loadPosts } from '../../utils/posts';
+
 const posts = loadPosts();
-const tags = [...new Set(posts.flatMap((post) => post.meta.tags))].sort();
-const base = Astro.base;
+const tags = getAllTags(posts);
 ---
-<BaseLayout title="태그">
-  <div class="card">
-    <h1>태그</h1>
-    <ul>
-      {tags.map((tag) => (
-        <li><a href={`${base}tags/${tag}`}>{tag}</a></li>
-      ))}
-    </ul>
+
+<BaseLayout
+  title="태그"
+  description="주제별로 글을 모아봅니다."
+>
+  <div class="container">
+    <div class="page-head">
+      <h1>태그</h1>
+      <p>
+        {tags.length}개의 태그로 {posts.length}편의 글을 분류하고 있습니다.
+        관심 있는 주제를 눌러 관련 글만 모아 보세요.
+      </p>
+    </div>
+
+    <div style="padding-bottom:72px">
+      {
+        tags.length === 0 ? (
+          <div class="empty-state">
+            <strong>아직 태그가 없습니다.</strong>
+            <span>글에 태그를 달면 이곳에 모입니다.</span>
+          </div>
+        ) : (
+          <div class="tag-cloud">
+            {tags.map(({ tag, count }) => (
+              <a href={withBase(`tags/${encodeURIComponent(tag)}`)}>
+                #{tag}
+                <span class="count">{count}</span>
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </div>
   </div>
 </BaseLayout>

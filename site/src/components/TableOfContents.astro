@@ -1,0 +1,82 @@
+---
+import type { TocEntry } from '../utils/render';
+
+type Props = { toc: TocEntry[] };
+
+const { toc } = Astro.props;
+// h1은 본문에서 거의 쓰이지 않으므로 depth 2~3만 목차에 노출한다.
+const entries = toc.filter((entry) => entry.depth <= 3);
+---
+
+{
+  entries.length > 1 && (
+    <nav class="toc" aria-label="목차" data-toc>
+      <p class="toc-title">목차</p>
+      <ul>
+        {entries.map((entry) => (
+          <li>
+            <a href={`#${entry.slug}`} data-depth={entry.depth}>
+              {entry.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<script>
+  // 현재 화면에 보이는 섹션을 목차에서 강조한다.
+  let tocObserver = null;
+
+  const setupToc = () => {
+    if (tocObserver) tocObserver.disconnect();
+
+    const toc = document.querySelector('[data-toc]');
+    if (!toc) return;
+
+    const links = Array.from(toc.querySelectorAll('a[href^="#"]'));
+    if (links.length === 0) return;
+
+    const slugOf = (link) => decodeURIComponent(link.hash.slice(1));
+
+    const headings = links
+      .map((link) => document.getElementById(slugOf(link)))
+      .filter((element) => element !== null);
+
+    if (headings.length === 0) return;
+
+    const visible = new Set();
+
+    const highlight = () => {
+      // 화면에 여러 섹션이 걸쳐 있으면 문서 순서상 가장 위쪽을 활성화한다.
+      const inView = headings.find((heading) => visible.has(heading.id));
+      const passed = headings
+        .slice()
+        .reverse()
+        .find((heading) => heading.getBoundingClientRect().top < 120);
+      const current = (inView || passed || {}).id;
+
+      links.forEach((link) => {
+        link.dataset.active = String(slugOf(link) === current);
+      });
+    };
+
+    tocObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) visible.add(entry.target.id);
+          else visible.delete(entry.target.id);
+        });
+        highlight();
+      },
+      { rootMargin: '-100px 0px -65% 0px', threshold: 0 },
+    );
+
+    headings.forEach((heading) => tocObserver.observe(heading));
+    highlight();
+  };
+
+  setupToc();
+  document.addEventListener('astro:page-load', setupToc);
+</script>

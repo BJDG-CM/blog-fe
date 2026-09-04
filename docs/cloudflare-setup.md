@@ -1,125 +1,126 @@
 # Cloudflare 배포 · 편집 설정
 
-`blog.yejunlee.com` 을 Cloudflare Pages 로 배포하고, `/admin` 에서 사이트를
-직접 편집할 수 있게 만드는 설정 절차입니다.
+`blog.yejunlee.com` 이 어떻게 배포되고, `/admin` 편집 기능이 무엇에 의존하는지
+정리한 문서입니다. 이미 설정이 끝난 상태이므로, 다시 만들거나 넘겨줄 때
+참고하면 됩니다.
 
-구조는 이렇습니다.
+## 구조
 
 ```
-방문자 ──▶ blog.yejunlee.com (Cloudflare Pages, 정적)
+방문자 ──▶ blog.yejunlee.com (Cloudflare Pages)
                   │
                   ├─ /admin      ── Cloudflare Access 로 잠금
                   └─ /api/*      ── Pages Functions
                                       │
                                       └─▶ GitHub Contents API 로 커밋
-                                            └─▶ 푸시가 재빌드를 트리거
+                                            └─▶ 푸시가 재배포를 트리거
+
+master 푸시 ──▶ GitHub Actions ──▶ 검사 → 빌드 → wrangler pages deploy
 ```
 
-글은 계속 저장소의 `site/src/content/posts/*.json` 에 파일로 남습니다.
-편집 화면은 그 파일을 대신 커밋해 주는 역할만 합니다. 별도의 데이터베이스는
-없고, 저장 후 사이트에 반영되기까지 재빌드 시간(보통 1~3분)이 걸립니다.
+글은 저장소의 `site/src/content/posts/*.json` 에 파일로 남습니다. 편집 화면은
+그 파일을 대신 커밋해 주는 역할만 하고, 별도의 데이터베이스는 없습니다.
+저장 후 사이트에 반영되기까지 재빌드 시간(보통 1~3분)이 걸립니다.
 
 ---
 
-## 1. Pages 프로젝트 만들기
-
-Cloudflare 대시보드 → **Workers & Pages → Create → Pages → Connect to Git**
-에서 `BJDG-CM/blog-fe` 를 연결하고 다음 값을 넣습니다.
+## 1. Pages 프로젝트
 
 | 항목 | 값 |
 | --- | --- |
-| Production branch | `master` |
-| Framework preset | None |
-| Build command | `yarn workspace blog-site build` |
-| Build output directory | `site/dist` |
-| Root directory | `/` (비움) |
+| 프로젝트 이름 | `blog-fe` |
+| 기본 도메인 | `blog-fe-ddv.pages.dev` |
+| 커스텀 도메인 | `blog.yejunlee.com` |
+| 배포 방식 | Direct upload (GitHub Actions 에서 업로드) |
+| 프로덕션 브랜치 | `master` |
 
-저장소 루트의 `packageManager` 필드가 `yarn@3.3.1` 이라 Corepack 이 같은
-Yarn 버전을 사용합니다. Node 버전은 `.node-version` 파일(22)을 따릅니다.
+Git 연결형이 아니라 **direct upload** 프로젝트입니다. 빌드는 GitHub Actions 가
+맡고, `wrangler pages deploy` 로 결과물만 올립니다. 덕분에 배포 전에 lint ·
+타입 검사 · 테스트를 강제할 수 있습니다.
 
-### 빌드 환경 변수 (Production)
-
-| 이름 | 값 |
-| --- | --- |
-| `PUBLIC_SITE_URL` | `https://blog.yejunlee.com` |
-| `PUBLIC_BASE_PATH` | `/` |
-
-`PUBLIC_PRIVATE_MODE` 는 프라이빗 모드를 쓸 때만 `true` 로 두고,
-그때는 `PRIVATE_PASSPHRASE` 도 함께 넣습니다.
+만약 Cloudflare 가 직접 빌드하도록 바꾸고 싶다면 대시보드에서 프로젝트를
+지우고 **Connect to Git** 으로 다시 만들어야 합니다. 그 경우 빌드 명령은
+`yarn workspace blog-site build`, 출력 디렉터리는 `site/dist` 입니다.
 
 ---
 
-## 2. 도메인 연결
+## 2. 배포 워크플로
 
-1. Pages 프로젝트 → **Custom domains → Set up a custom domain** →
-   `blog.yejunlee.com`
-2. DNS 레코드는 Cloudflare 가 자동으로 만들어 줍니다.
-   (`blog` CNAME → `<project>.pages.dev`, 프록시 켜짐)
+`.github/workflows/deploy-cloudflare.yml` 이 `master` 푸시마다 실행됩니다.
 
-`yejunlee.com` 루트는 지금처럼 GitHub Pages 를 그대로 두면 됩니다.
-서로 다른 호스트라 충돌하지 않습니다.
+필요한 값:
+
+| 위치 | 이름 | 설명 |
+| --- | --- | --- |
+| GitHub Secret | `CLOUDFLARE_API_TOKEN` | `Cloudflare Pages: Edit` 권한만 가진 토큰 |
+| GitHub Variable | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare 계정 ID |
+
+빌드 시 환경 변수는 워크플로 안에 직접 적혀 있습니다.
+
+```yaml
+PUBLIC_SITE_URL: https://blog.yejunlee.com
+PUBLIC_BASE_PATH: "/"
+```
+
+프라이빗 모드를 쓸 때만 저장소 변수 `PRIVATE_MODE` 를 `true` 로 두고,
+시크릿 `PRIVATE_PASSPHRASE` 를 함께 등록합니다.
+
+`.github/workflows/deploy.yml` 은 기존 `yejunlee.com/blog-fe/` 를 유지하기 위해
+남아 있습니다. 새 도메인이 안정되면 지워도 됩니다.
 
 ---
 
-## 3. 편집 API 에 필요한 값
+## 3. 편집 API 환경 변수
 
-Pages 프로젝트 → **Settings → Variables and Secrets** 에서
-**Production 과 Preview 양쪽에** 넣습니다.
+Pages 프로젝트 → **Settings → Variables and Secrets** (Production).
 
 | 이름 | 종류 | 값 |
 | --- | --- | --- |
-| `GITHUB_TOKEN` | Secret | 아래에서 만드는 fine-grained 토큰 |
+| `GITHUB_TOKEN` | Secret | fine-grained PAT (아래 참고) |
 | `GITHUB_REPO` | Text | `BJDG-CM/blog-fe` |
 | `GITHUB_BRANCH` | Text | `master` |
 | `GIT_AUTHOR_NAME` | Text | 커밋에 남길 이름 |
 | `GIT_AUTHOR_EMAIL` | Text | 커밋에 남길 이메일 |
 | `CF_ACCESS_TEAM_DOMAIN` | Text | `<팀이름>.cloudflareaccess.com` |
-| `CF_ACCESS_AUD` | Text | 4단계에서 받는 Application Audience 태그 |
+| `CF_ACCESS_AUD` | Text | Access 애플리케이션의 AUD 태그 |
 
 ### GitHub 토큰
 
 GitHub → Settings → Developer settings →
-**Personal access tokens → Fine-grained tokens → Generate new token**
+**Personal access tokens → Fine-grained tokens**
 
 - Repository access: **Only select repositories** → `BJDG-CM/blog-fe`
-- Repository permissions: **Contents → Read and write** (그 외는 전부 No access)
-- 만료일은 짧게 잡고 주기적으로 갱신하는 편이 안전합니다
+- Repository permissions: **Contents → Read and write** (그 외 전부 No access)
 
 이 토큰은 저장소 파일을 고칠 수 있으므로 다른 곳에 재사용하지 마세요.
+만료되면 편집 저장이 실패하므로, 갱신 후 Pages 시크릿을 다시 넣어야 합니다.
 
 ---
 
-## 4. Cloudflare Access 로 편집만 잠그기
+## 4. Cloudflare Access
 
-Zero Trust 대시보드 → **Access → Applications → Add an application →
-Self-hosted**
+Zero Trust → **Access → Applications → Self-hosted**
 
 | 항목 | 값 |
 | --- | --- |
 | Application name | `blog admin` |
-| Session duration | 원하는 값 (예: 24시간) |
 | Domain | `blog.yejunlee.com` |
-| Path | `admin` |
+| Path | `admin` 과 `api` |
 
-`/api` 경로에도 같은 방식으로 하나 더 추가합니다. 두 애플리케이션의
-**Application Audience (AUD) 태그가 같아야** 하므로, 하나의 애플리케이션에
-경로를 두 개 등록하는 편이 간단합니다.
+경로를 두 개 등록해 **하나의 애플리케이션**으로 두는 편이 좋습니다. 그래야
+AUD 태그가 하나라 `CF_ACCESS_AUD` 도 하나로 끝납니다.
 
 정책은 이렇게 둡니다.
 
-- Policy name: `owner only`
 - Action: **Allow**
 - Include: **Emails** → 본인 이메일
 
-본문 경로에는 애플리케이션을 만들지 않습니다. 그래야 글은 누구나 로그인
-없이 읽고, `/admin` 과 `/api` 만 로그인을 요구합니다.
-
-애플리케이션 개요 화면의 **Application Audience (AUD) Tag** 값을 복사해
-3단계의 `CF_ACCESS_AUD` 에 넣고 다시 배포합니다.
+본문 경로에는 애플리케이션을 만들지 않습니다. 그래야 글은 누구나 로그인 없이
+읽고, `/admin` 과 `/api` 만 로그인을 요구합니다.
 
 > `CF_ACCESS_TEAM_DOMAIN` 또는 `CF_ACCESS_AUD` 가 비어 있으면 편집 API 는
 > 요청을 전부 거부합니다. 설정이 빠진 상태로 쓰기 경로가 열리는 것을 막기
-> 위한 동작입니다.
+> 위한 동작이라, 값을 넣고 재배포해야 편집이 켜집니다.
 
 ---
 
@@ -127,20 +128,10 @@ Self-hosted**
 
 1. 시크릿 창에서 `https://blog.yejunlee.com` — 로그인 없이 보여야 합니다
 2. `https://blog.yejunlee.com/admin` — Cloudflare 로그인 화면이 떠야 합니다
-3. 로그인 후 글을 하나 고쳐 저장 → 저장소에 커밋이 생기고, 재빌드 후 반영
+3. 로그인 후 글을 고쳐 저장 → 저장소에 커밋이 생기고, 재배포 후 반영
 
-문제가 생기면 Pages 프로젝트의 **Functions → Real-time Logs** 에서
-`/api/*` 요청의 오류 메시지를 볼 수 있습니다.
+`curl https://blog.yejunlee.com/api/me` 가 로그인 없이 401/403 을 주면 정상이고,
+`500` 과 함께 Access 설정 안내가 오면 3번 표의 환경 변수가 빠진 상태입니다.
 
----
-
-## 6. GitHub Pages 정리 (선택)
-
-`blog.yejunlee.com` 이 정상 동작하는 것을 확인한 뒤에는 기존 GitHub Pages
-배포가 더 이상 필요하지 않습니다.
-
-1. `.github/workflows/deploy.yml` 삭제
-2. 저장소 **Settings → Pages → Source: None**
-
-지금 당장 지우지 않아도 두 곳이 각자 잘 동작하므로, 새 도메인이 안정된 뒤에
-정리하면 됩니다.
+문제가 생기면 Pages 프로젝트의 **Functions → Real-time Logs** 에서 `/api/*`
+요청의 오류 메시지를 볼 수 있습니다.

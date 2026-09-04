@@ -1,0 +1,363 @@
+{
+  "slug": "blog-renewal",
+  "meta": {
+    "title": "블로그를 새로 단장했습니다",
+    "date": "2026-09-04",
+    "tags": ["astro", "design", "frontend"],
+    "summary": "커맨드 팔레트 검색, 목차, 코드 하이라이팅, 다크 모드까지. 정적 블로그에 필요한 편의 기능을 한 번에 정리한 리뉴얼 기록입니다.",
+    "featured": true,
+    "draft": false
+  },
+  "doc": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "글을 쌓는 것보다 중요한 건 다시 찾아 읽는 일이라고 생각합니다. 이번 리뉴얼은 “쓰기 편한 블로그”보다 “다시 읽기 편한 블로그”에 초점을 맞췄습니다."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": { "level": 2 },
+        "content": [{ "type": "text", "text": "무엇이 달라졌나" }]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          { "type": "text", "text": "가장 크게 바뀐 건 " },
+          { "type": "text", "text": "탐색", "marks": [{ "type": "bold" }] },
+          {
+            "type": "text",
+            "text": " 입니다. 어느 페이지에서든 단축키 한 번으로 제목·태그·본문까지 훑어볼 수 있게 했습니다."
+          }
+        ]
+      },
+      {
+        "type": "bulletList",
+        "content": [
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "커맨드 팔레트",
+                    "marks": [{ "type": "bold" }]
+                  },
+                  {
+                    "type": "text",
+                    "text": " — ⌘K 또는 / 키로 열리는 전역 검색. 본문 내용까지 검색하고 매칭된 부분을 강조해 보여줍니다."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "글 목록 필터",
+                    "marks": [{ "type": "bold" }]
+                  },
+                  {
+                    "type": "text",
+                    "text": " — 태그 칩과 정렬 기준을 조합해 좁혀볼 수 있고, 선택한 조건은 주소창에 남아 그대로 공유됩니다."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "목차와 진행률",
+                    "marks": [{ "type": "bold" }]
+                  },
+                  {
+                    "type": "text",
+                    "text": " — 긴 글에서는 현재 읽는 위치를 목차가 따라옵니다. 상단의 얇은 막대로 남은 분량도 가늠할 수 있습니다."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "listItem",
+            "content": [
+              {
+                "type": "paragraph",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "관련 글과 이전·다음 글",
+                    "marks": [{ "type": "bold" }]
+                  },
+                  {
+                    "type": "text",
+                    "text": " — 태그 유사도로 이어 읽을 글을 추천합니다."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": { "level": 2 },
+        "content": [{ "type": "text", "text": "읽는 화면 다듬기" }]
+      },
+      {
+        "type": "heading",
+        "attrs": { "level": 3 },
+        "content": [{ "type": "text", "text": "타이포그래피와 테마" }]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "본문은 Pretendard를 기준으로 행간과 자간을 다시 잡았고, 한글이 어절 중간에서 잘리지 않도록 줄바꿈 규칙을 조정했습니다. 색은 전부 oklch 토큰으로 정의해 라이트·다크 어느 쪽에서도 대비가 무너지지 않게 했습니다."
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "테마는 라이트 / 다크 / 시스템 세 단계로 순환하며, 첫 페인트 전에 결정되기 때문에 새로고침해도 화면이 번쩍이지 않습니다."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": { "level": 3 },
+        "content": [{ "type": "text", "text": "코드 블록" }]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "코드는 빌드 시점에 Shiki로 하이라이팅합니다. 라이트·다크 두 테마를 동시에 심어두고 CSS 변수로 전환하기 때문에, 테마를 바꿔도 다시 칠하는 비용이 없습니다."
+          }
+        ]
+      },
+      {
+        "type": "codeBlock",
+        "attrs": { "language": "typescript" },
+        "content": [
+          {
+            "type": "text",
+            "text": "// 태그 자카드 유사도로 관련 글을 고른다\nconst shared = tags.filter((tag) => currentTags.has(tag)).length;\nconst union = new Set([...currentTags, ...tags]).size || 1;\n\nreturn { post, score: shared / union };"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "각 블록에는 복사 버튼이 붙어 있어 마우스 두 번이면 그대로 가져갈 수 있습니다."
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": { "level": 2 },
+        "content": [{ "type": "text", "text": "구조는 그대로" }]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "빌드와 배포 방식은 바꾸지 않았습니다. 서버도 데이터베이스도 없이, 로컬 작성도구에서 저장한 파일을 커밋하면 GitHub Actions가 정적 사이트를 만들어 Pages로 올립니다."
+          }
+        ]
+      },
+      {
+        "type": "table",
+        "content": [
+          {
+            "type": "tableRow",
+            "content": [
+              {
+                "type": "tableHeader",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "영역" }]
+                  }
+                ]
+              },
+              {
+                "type": "tableHeader",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "사용 기술" }]
+                  }
+                ]
+              },
+              {
+                "type": "tableHeader",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "비고" }]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tableRow",
+            "content": [
+              {
+                "type": "tableCell",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "사이트" }]
+                  }
+                ]
+              },
+              {
+                "type": "tableCell",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "Astro + React 아일랜드" }]
+                  }
+                ]
+              },
+              {
+                "type": "tableCell",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "필요한 곳에만 자바스크립트를 보냅니다"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tableRow",
+            "content": [
+              {
+                "type": "tableCell",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "작성" }]
+                  }
+                ]
+              },
+              {
+                "type": "tableCell",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "Tiptap 로컬 에디터" }]
+                  }
+                ]
+              },
+              {
+                "type": "tableCell",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "JSON으로 저장 후 커밋" }]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tableRow",
+            "content": [
+              {
+                "type": "tableCell",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "배포" }]
+                  }
+                ]
+              },
+              {
+                "type": "tableCell",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "GitHub Actions → Pages" }]
+                  }
+                ]
+              },
+              {
+                "type": "tableCell",
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "푸시하면 자동 배포" }]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "blockquote",
+        "content": [
+          {
+            "type": "paragraph",
+            "content": [
+              {
+                "type": "text",
+                "text": "정적 사이트의 프라이빗 모드는 완전한 접근 통제가 아니라 평문 노출을 막기 위한 보호 장치입니다. 정말 민감한 글이라면 애초에 올리지 않는 편이 낫습니다."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "heading",
+        "attrs": { "level": 2 },
+        "content": [{ "type": "text", "text": "앞으로" }]
+      },
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "이제 껍데기는 갖춰졌으니, 남은 건 채우는 일입니다. 읽고 만들면서 남길 만한 것들을 여기에 차곡차곡 쌓아둘 생각입니다."
+          }
+        ]
+      }
+    ]
+  }
+}

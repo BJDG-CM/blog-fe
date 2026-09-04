@@ -1,0 +1,58 @@
+---
+import type { PostEntry } from '../utils/posts';
+import { postReadingTime, postSummary } from '../utils/posts';
+import { formatDate, gradientFor, isoDate } from '../utils/format';
+import { withBase } from '../utils/url';
+
+type Props = {
+  post: PostEntry;
+  featured?: boolean;
+  index?: number;
+};
+
+const { post, featured = false, index = 0 } = Astro.props;
+
+const summary = postSummary(post, featured ? 180 : 130);
+const minutes = postReadingTime(post);
+const gradient = gradientFor(post.slug);
+const href = withBase(`posts/${post.slug}`);
+---
+
+<article
+  class:list={['post-card', 'reveal', { featured }]}
+  style={`--i:${index}; --card-gradient:${gradient}; --card-accent:${gradient}`}
+>
+  {featured && <div class="thumb" aria-hidden="true"></div>}
+
+  <div class:list={[featured && 'body']}>
+    <div class="meta">
+      <time datetime={isoDate(post.meta.date)}>{formatDate(post.meta.date)}</time>
+      <span class="dot" aria-hidden="true"></span>
+      <span>{minutes}분 읽기</span>
+      {
+        featured && (
+          <>
+            <span class="dot" aria-hidden="true" />
+            <span>대표 글</span>
+          </>
+        )
+      }
+    </div>
+
+    <h3><a href={href}>{post.meta.title}</a></h3>
+
+    {summary && <p>{summary}</p>}
+
+    {
+      post.meta.tags?.length > 0 && (
+        <div class="tags">
+          {post.meta.tags.slice(0, 4).map((tag) => (
+            <a class="tag" href={withBase(`tags/${encodeURIComponent(tag)}`)}>
+              #{tag}
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</article>

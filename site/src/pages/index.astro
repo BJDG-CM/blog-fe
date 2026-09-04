@@ -1,32 +1,138 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Search from '../components/Search';
-import { loadPosts, renderPostHtml } from '../utils/posts';
+import PostCard from '../components/PostCard.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../config';
+import { withBase } from '../utils/url';
+import { formatDate } from '../utils/format';
+import { getAllTags, getFeaturedPost, loadPosts } from '../utils/posts';
+
 const posts = loadPosts();
+const featured = getFeaturedPost(posts);
+const tags = getAllTags(posts);
+
+const recent = posts
+  .filter((post) => post.slug !== featured?.slug)
+  .slice(0, site.recentCount);
+
+const lastUpdated = posts[0]?.meta.date;
 const privateMode = import.meta.env.PUBLIC_PRIVATE_MODE === 'true';
-const searchItems = posts.map((post) => ({
-  slug: post.slug,
-  title: post.meta.title,
-  summary: post.meta.summary,
-  tags: post.meta.tags
-}));
-const base = Astro.base;
 ---
-<BaseLayout title="나의 블로그">
-  <section class="notice">
-    <strong>모드:</strong> {privateMode ? '프라이빗(암호화)' : '기본(공개)'}
+
+<BaseLayout title={site.name} description={site.description}>
+  <section class="hero">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="hero-grid"></div>
+      <div class="hero-orb"></div>
+    </div>
+
+    <div class="container">
+      <p class="eyebrow">
+        <Icon name="sparkles" size={13} />
+        {privateMode ? '프라이빗 모드' : '개인 블로그'}
+      </p>
+
+      <h1>
+        기록은 결국 <span class="gradient-text">더 나은 다음</span>을 만든다
+      </h1>
+
+      <p class="lead">{site.description}</p>
+
+      <div class="hero-actions">
+        <a class="btn btn-primary" href={withBase('posts')}>
+          글 둘러보기
+          <Icon name="arrowRight" size={16} />
+        </a>
+        <button type="button" class="btn" data-open-palette>
+          <Icon name="search" size={15} />
+          검색
+          <kbd class="kbd">⌘K</kbd>
+        </button>
+      </div>
+
+      {
+        posts.length > 0 && (
+          <dl class="hero-stats">
+            <div>
+              <dt>발행한 글</dt>
+              <dd>{posts.length}</dd>
+            </div>
+            <div>
+              <dt>태그</dt>
+              <dd>{tags.length}</dd>
+            </div>
+            {lastUpdated && (
+              <div>
+                <dt>마지막 업데이트</dt>
+                <dd>{formatDate(lastUpdated)}</dd>
+              </div>
+            )}
+          </dl>
+        )
+      }
+    </div>
   </section>
-  <Search client:load items={searchItems} />
-  <section class="card-grid">
-    {posts.map((post) => (
-      <article class="card" key={post.slug}>
-        <h2><a href={`${base}posts/${post.slug}`}>{post.meta.title}</a></h2>
-        <p>{post.meta.summary}</p>
-        <small>{post.meta.date}</small>
-        {!privateMode && (
-          <div class="post-content" set:html={renderPostHtml(post)} />
+
+  {
+    posts.length === 0 ? (
+      <div class="container" style="padding-bottom:72px">
+        <div class="empty-state">
+          <strong>아직 발행된 글이 없습니다.</strong>
+          <span>
+            <code>npm run author</code> 로 작성도구를 열어 첫 글을 남겨보세요.
+          </span>
+        </div>
+      </div>
+    ) : (
+      <div class="container" style="padding-bottom:72px">
+        {featured && (
+          <section style="margin-bottom:56px">
+            <div class="section-head">
+              <h2>대표 글</h2>
+            </div>
+            <div class="card-grid">
+              <PostCard post={featured} featured />
+            </div>
+          </section>
         )}
-      </article>
-    ))}
-  </section>
+
+        {recent.length > 0 && (
+          <section style="margin-bottom:56px">
+            <div class="section-head">
+              <h2>최근 글</h2>
+              <a class="more" href={withBase('posts')}>
+                전체 보기
+                <Icon name="arrowRight" size={14} />
+              </a>
+            </div>
+            <div class="card-grid">
+              {recent.map((post, index) => (
+                <PostCard post={post} index={index} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {tags.length > 0 && (
+          <section>
+            <div class="section-head">
+              <h2>태그로 찾기</h2>
+              <a class="more" href={withBase('tags')}>
+                전체 태그
+                <Icon name="arrowRight" size={14} />
+              </a>
+            </div>
+            <div class="tag-cloud">
+              {tags.slice(0, 12).map(({ tag, count }) => (
+                <a href={withBase(`tags/${encodeURIComponent(tag)}`)}>
+                  #{tag}
+                  <span class="count">{count}</span>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    )
+  }
 </BaseLayout>

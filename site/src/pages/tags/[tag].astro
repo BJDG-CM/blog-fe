@@ -1,26 +1,64 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { loadPosts } from '../../utils/posts';
+import PostCard from '../../components/PostCard.astro';
+import Icon from '../../components/Icon.astro';
+import { withBase } from '../../utils/url';
+import { getAllTags, loadPosts, type PostEntry } from '../../utils/posts';
 
 export function getStaticPaths() {
   const posts = loadPosts();
-  const tags = [...new Set(posts.flatMap((post) => post.meta.tags))];
-  return tags.map((tag) => ({
+  const tags = getAllTags(posts);
+
+  return tags.map(({ tag }) => ({
     params: { tag },
-    props: { tag, posts: posts.filter((post) => post.meta.tags.includes(tag)) }
+    props: {
+      tag,
+      posts: posts.filter((post) => (post.meta.tags ?? []).includes(tag)),
+    },
   }));
 }
 
-const { tag, posts } = Astro.props;
-const base = Astro.base;
+type Props = { tag: string; posts: PostEntry[] };
+
+const { tag, posts } = Astro.props as Props;
+const allTags = getAllTags();
 ---
-<BaseLayout title={`태그: ${tag}`}>
-  <div class="card">
-    <h1>태그: {tag}</h1>
-    <ul>
-      {posts.map((post) => (
-        <li><a href={`${base}posts/${post.slug}`}>{post.meta.title}</a></li>
-      ))}
-    </ul>
+
+<BaseLayout
+  title={`#${tag}`}
+  description={`${tag} 태그가 달린 글 ${posts.length}편.`}
+>
+  <div class="container">
+    <div class="page-head">
+      <p class="eyebrow">
+        <Icon name="tags" size={13} />
+        태그
+      </p>
+      <h1>#{tag}</h1>
+      <p>이 태그가 달린 글 {posts.length}편입니다.</p>
+
+      <div class="chip-row" style="margin-top:20px">
+        <a class="tag" href={withBase('tags')}>← 전체 태그</a>
+        {
+          allTags
+            .filter((item) => item.tag !== tag)
+            .slice(0, 8)
+            .map((item) => (
+              <a
+                class="tag"
+                href={withBase(`tags/${encodeURIComponent(item.tag)}`)}
+              >
+                #{item.tag} {item.count}
+              </a>
+            ))
+        }
+      </div>
+    </div>
+
+    <div style="padding-bottom:72px">
+      <div class="card-grid">
+        {posts.map((post, index) => <PostCard post={post} index={index} />)}
+      </div>
+    </div>
   </div>
 </BaseLayout>

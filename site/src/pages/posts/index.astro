@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostFilter from '../../components/PostFilter';
+import { withBase } from '../../utils/url';
+import { gradientFor } from '../../utils/format';
+import {
+  getAllTags,
+  loadPosts,
+  postReadingTime,
+  postSummary,
+} from '../../utils/posts';
+
+const posts = loadPosts();
+const tags = getAllTags(posts);
+
+const items = posts.map((post) => ({
+  slug: post.slug,
+  title: post.meta.title,
+  summary: postSummary(post, 130),
+  tags: post.meta.tags ?? [],
+  date: post.meta.date,
+  minutes: postReadingTime(post),
+  gradient: gradientFor(post.slug),
+}));
+---
+
+<BaseLayout
+  title="글"
+  description="발행한 모든 글을 검색하고 태그로 좁혀볼 수 있습니다."
+>
+  <div class="container">
+    <div class="page-head">
+      <h1>글</h1>
+      <p>
+        지금까지 {posts.length}편의 글을 남겼습니다. 제목·요약·태그로 좁혀보거나
+        <kbd class="kbd">⌘K</kbd> 로 본문까지 검색할 수 있습니다.
+      </p>
+    </div>
+
+    <div style="padding-bottom:72px">
+      {
+        items.length === 0 ? (
+          <div class="empty-state">
+            <strong>아직 발행된 글이 없습니다.</strong>
+            <span>작성도구에서 첫 글을 남겨보세요.</span>
+          </div>
+        ) : (
+          <PostFilter
+            client:load
+            items={items}
+            tags={tags}
+            base={withBase('')}
+          />
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>

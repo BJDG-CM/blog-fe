@@ -1,0 +1,59 @@
+---
+import { site } from '../config';
+import { withBase } from '../utils/url';
+import { getAllTags, loadPosts } from '../utils/posts';
+
+const posts = loadPosts();
+const topTags = getAllTags(posts).slice(0, 5);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="name">{site.name}</span>
+        <p>{site.description}</p>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-col">
+          <span class="h">둘러보기</span>
+          {
+            site.nav
+              .filter((item) => item.href !== '')
+              .map((item) => <a href={withBase(item.href)}>{item.label}</a>)
+          }
+        </div>
+
+        {
+          topTags.length > 0 && (
+            <div class="footer-col">
+              <span class="h">주요 태그</span>
+              {topTags.map(({ tag }) => (
+                <a href={withBase(`tags/${encodeURIComponent(tag)}`)}>#{tag}</a>
+              ))}
+            </div>
+          )
+        }
+
+        <div class="footer-col">
+          <span class="h">구독 · 연결</span>
+          <a href={withBase('rss.xml')}>RSS</a>
+          {
+            site.social.map((item) => (
+              <a href={item.href} rel="me noopener noreferrer" target="_blank">
+                {item.label}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© {year} {site.author.name}. All rights reserved.</span>
+      <span>Astro · GitHub Pages로 배포됩니다.</span>
+    </div>
+  </div>
+</footer>

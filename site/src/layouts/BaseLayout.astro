@@ -1,29 +1,219 @@
 ---
-import ThemeToggle from '../components/ThemeToggle';
+import { ViewTransitions } from 'astro:transitions';
+import { site } from '../config';
+import { withBase } from '../utils/url';
+import { buildSearchIndex } from '../utils/posts';
+import SEO from '../components/SEO.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Icon from '../components/Icon.astro';
+import CommandPalette from '../components/CommandPalette';
 import '../styles/global.css';
-const { title } = Astro.props;
-const base = Astro.base;
+
+type Props = {
+  title: string;
+  description?: string;
+  type?: 'website' | 'article';
+  publishedAt?: string;
+  updatedAt?: string;
+  tags?: string[];
+  /** 글 상세처럼 상단 진행바가 필요한 페이지 */
+  showProgress?: boolean;
+};
+
+const {
+  title,
+  description,
+  type = 'website',
+  publishedAt,
+  updatedAt,
+  tags = [],
+  showProgress = false,
+} = Astro.props;
+
+const searchIndex = buildSearchIndex();
+const paletteNav = site.nav.map((item) => ({
+  href: item.href,
+  label: item.label,
+}));
+const base = withBase('');
 ---
+
 <!DOCTYPE html>
 <html lang="ko" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href={withBase('favicon.svg')} type="image/svg+xml" />
+    <meta name="theme-color" content="#0f1117" />
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+    />
+
+    <SEO
+      title={title}
+      description={description}
+      type={type}
+      publishedAt={publishedAt}
+      updatedAt={updatedAt}
+      tags={tags}
+    />
+
+    <ViewTransitions />
+
+    {/* 첫 페인트 전에 테마를 확정해 깜빡임(FOUC)을 막는다. */}
+    <script is:inline>
+      (function () {
+        const KEY = 'blog-theme';
+        const resolve = () => {
+          let mode = 'system';
+          try {
+            mode = localStorage.getItem(KEY) || 'system';
+          } catch (error) {
+            mode = 'system';
+          }
+          if (mode === 'light' || mode === 'dark') return mode;
+          return window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
+        };
+        const apply = () => {
+          document.documentElement.dataset.theme = resolve();
+        };
+        apply();
+        document.addEventListener('astro:after-swap', apply);
+      })();
+    </script>
   </head>
+
   <body>
-    <header>
-      <a href={base}>나의 블로그</a>
-      <div>
-        <a href={`${base}tags`}>태그</a>
-        <span style="margin-left: 1rem;">
-          <ThemeToggle client:load />
-        </span>
-      </div>
-    </header>
-    <main>
+    <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+
+    {
+      showProgress && (
+        <div class="reading-progress" data-progress aria-hidden="true">
+          <span></span>
+        </div>
+      )
+    }
+
+    <Header />
+
+    <main id="main">
       <slot />
     </main>
+
+    <Footer />
+
+    <button type="button" class="to-top" data-to-top aria-label="맨 위로">
+      <Icon name="arrowUp" size={17} />
+    </button>
+
+    <CommandPalette
+      client:idle
+      items={searchIndex}
+      nav={paletteNav}
+      base={base}
+    />
+
+    <script>
+      // 페이지 전역 상호작용: 코드 복사 · 이미지 라이트박스 · 맨 위로 · 읽기 진행바
+      const setup = () => {
+        /* --- 코드 복사 --- */
+        document.querySelectorAll('[data-copy]').forEach((button) => {
+          if (button.dataset.bound === 'true') return;
+          button.dataset.bound = 'true';
+
+          button.addEventListener('click', async () => {
+            const block = button.closest('[data-code-block]');
+            const codeEl = block && block.querySelector('code');
+            const code = codeEl && codeEl.textContent;
+            if (!code) return;
+
+            try {
+              await navigator.clipboard.writeText(code);
+            } catch {
+              return;
+            }
+
+            const label = button.querySelector('[data-copy-label]');
+            button.dataset.copied = 'true';
+            if (label) label.textContent = '복사됨';
+
+            window.setTimeout(() => {
+              button.dataset.copied = 'false';
+              if (label) label.textContent = '복사';
+            }, 1600);
+          });
+        });
+
+        /* --- 이미지 라이트박스 --- */
+        const article = document.querySelector('.prose');
+        if (article && article.getAttribute('data-lightbox-bound') !== 'true') {
+          article.setAttribute('data-lightbox-bound', 'true');
+          article.addEventListener('click', (event) => {
+            const image = event.target.closest('img');
+            if (!image) return;
+
+            const overlay = document.createElement('div');
+            overlay.className = 'lightbox';
+            overlay.setAttribute('role', 'dialog');
+            overlay.setAttribute('aria-label', '이미지 확대 보기');
+
+            const clone = document.createElement('img');
+            clone.src = image.src;
+            clone.alt = image.alt;
+            overlay.appendChild(clone);
+
+            const onKey = (keyEvent) => {
+              if (keyEvent.key === 'Escape') dismiss();
+            };
+            function dismiss() {
+              overlay.remove();
+              document.body.style.overflow = '';
+              document.removeEventListener('keydown', onKey);
+            }
+
+            overlay.addEventListener('click', dismiss);
+            document.addEventListener('keydown', onKey);
+            document.body.style.overflow = 'hidden';
+            document.body.appendChild(overlay);
+          });
+        }
+
+        /* --- 맨 위로 --- */
+        const toTop = document.querySelector('[data-to-top]');
+        if (toTop && toTop.dataset.bound !== 'true') {
+          toTop.dataset.bound = 'true';
+          toTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+        }
+
+        onScroll();
+      };
+
+      /* --- 맨 위로 노출 + 읽기 진행바 (스크롤 핸들러는 한 번만 등록) --- */
+      const onScroll = () => {
+        const toTop = document.querySelector('[data-to-top]');
+        if (toTop) toTop.dataset.show = String(window.scrollY > 500);
+
+        const progress = document.querySelector('[data-progress] span');
+        if (progress) {
+          const max = document.body.scrollHeight - window.innerHeight;
+          const ratio = max > 0 ? (window.scrollY / max) * 100 : 0;
+          progress.style.width = `${Math.min(100, Math.max(0, ratio))}%`;
+        }
+      };
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      setup();
+      document.addEventListener('astro:page-load', setup);
+    </script>
   </body>
 </html>

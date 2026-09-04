@@ -1,29 +1,181 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PrivatePost from '../../components/PrivatePost';
-import { loadPosts, renderPostHtml } from '../../utils/posts';
+import PostCard from '../../components/PostCard.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import ShareBar from '../../components/ShareBar.astro';
+import Icon from '../../components/Icon.astro';
+import { site } from '../../config';
+import { withBase } from '../../utils/url';
+import { formatDate, isoDate } from '../../utils/format';
+import {
+  getAdjacentPosts,
+  getRelatedPosts,
+  loadPosts,
+  postReadingTime,
+  postSummary,
+  renderPost,
+  type PostEntry,
+} from '../../utils/posts';
 
 export function getStaticPaths() {
   return loadPosts().map((post) => ({
     params: { slug: post.slug },
-    props: { post }
+    props: { post },
   }));
 }
 
-const { post } = Astro.props;
+type Props = { post: PostEntry };
+
+const { post } = Astro.props as Props;
 const privateMode = import.meta.env.PUBLIC_PRIVATE_MODE === 'true';
-const html = renderPostHtml(post);
+
+const { html, toc } = await renderPost(post);
+const minutes = postReadingTime(post);
+const summary = postSummary(post, 180);
+const { newer, older } = getAdjacentPosts(post.slug);
+const related = getRelatedPosts(post.slug, 3);
+
+const shareUrl = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site).toString()
+  : Astro.url.pathname;
 ---
-<BaseLayout title={post.meta.title}>
-  <article class="card">
-    <h1>{post.meta.title}</h1>
-    <small>{post.meta.date}</small>
-    <div style={{ marginTop: '1rem' }}>
-      {privateMode && post.encrypted ? (
-        <PrivatePost client:load payload={post.encrypted} />
-      ) : (
-        <div class="post-content" set:html={html} />
-      )}
+
+<BaseLayout
+  title={post.meta.title}
+  description={summary || site.description}
+  type="article"
+  publishedAt={post.meta.date}
+  updatedAt={post.meta.updated}
+  tags={post.meta.tags}
+  showProgress
+>
+  <div class="container">
+    <header class="post-header">
+      <div class="chip-row" style="margin-bottom:18px">
+        <a class="tag" href={withBase('posts')}>← 글 목록</a>
+        {
+          (post.meta.tags ?? []).map((tag) => (
+            <a class="tag" href={withBase(`tags/${encodeURIComponent(tag)}`)}>
+              #{tag}
+            </a>
+          ))
+        }
+      </div>
+
+      <h1>{post.meta.title}</h1>
+
+      {summary && <p class="summary">{summary}</p>}
+
+      <div class="post-meta">
+        <span class="who">
+          <span class="avatar" aria-hidden="true"></span>
+          {site.author.name}
+        </span>
+        <span>
+          <time datetime={isoDate(post.meta.date)}>
+            {formatDate(post.meta.date)}
+          </time>
+        </span>
+        {
+          post.meta.updated && (
+            <span>
+              {formatDate(post.meta.updated)} 수정
+            </span>
+          )
+        }
+        {!privateMode && <span>{minutes}분 읽기</span>}
+        {privateMode && post.encrypted && <span>비공개 글</span>}
+      </div>
+    </header>
+
+    <div class="post-layout">
+      <div style="min-width:0">
+        {
+          privateMode && post.encrypted ? (
+            <PrivatePost client:load payload={post.encrypted} />
+          ) : (
+            <article class="prose" set:html={html} />
+          )
+        }
+
+        <ShareBar title={post.meta.title} url={shareUrl} />
+
+        {
+          (newer || older) && (
+            <nav class="post-nav" aria-label="이전 다음 글">
+              {older ? (
+                <a href={withBase(`posts/${older.slug}`)}>
+                  <span class="dir">
+                    <Icon name="arrowLeft" size={13} />
+                    이전 글
+                  </span>
+                  <span class="t">{older.meta.title}</span>
+                </a>
+              ) : (
+                <span />
+              )}
+
+              {newer && (
+                <a class="next" href={withBase(`posts/${newer.slug}`)}>
+                  <span class="dir">
+                    다음 글
+                    <Icon name="arrowRight" size={13} />
+                  </span>
+                  <span class="t">{newer.meta.title}</span>
+                </a>
+              )}
+            </nav>
+          )
+        }
+
+        {
+          related.length > 0 && (
+            <section style="margin-top:56px">
+              <div class="section-head">
+                <h2>함께 읽어보기</h2>
+              </div>
+              <div class="card-grid">
+                {related.map((item, index) => (
+                  <PostCard post={item} index={index} />
+                ))}
+              </div>
+            </section>
+          )
+        }
+      </div>
+
+      <aside class="post-aside">
+        {!privateMode && <TableOfContents toc={toc} />}
+
+        <div class="aside-actions">
+          <button
+            type="button"
+            class="icon-btn"
+            data-open-palette
+            aria-label="검색 열기"
+            title="검색 (⌘K)"
+          >
+            <Icon name="search" size={16} />
+          </button>
+          <a
+            class="icon-btn"
+            href={withBase('archive')}
+            aria-label="아카이브"
+            title="아카이브"
+          >
+            <Icon name="archive" size={16} />
+          </a>
+          <a
+            class="icon-btn"
+            href={withBase('rss.xml')}
+            aria-label="RSS"
+            title="RSS"
+          >
+            <Icon name="rss" size={16} />
+          </a>
+        </div>
+      </aside>
     </div>
-  </article>
+  </div>
 </BaseLayout>

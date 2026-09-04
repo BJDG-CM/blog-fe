@@ -1,0 +1,84 @@
+---
+import { site } from '../config';
+import { withBase, isActivePath } from '../utils/url';
+import Icon from './Icon.astro';
+import ThemeToggle from './ThemeToggle';
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="site-header" data-site-header>
+  <div class="container">
+    <a class="brand" href={withBase('')} aria-label={`${site.name} 홈`}>
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>{site.name}</span>
+    </a>
+
+    <nav class="nav" aria-label="주요 메뉴">
+      {
+        site.nav.map((item) => (
+          <a
+            href={withBase(item.href)}
+            aria-current={isActivePath(currentPath, item.href) ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        class="search-trigger"
+        data-open-palette
+        aria-label="검색 열기"
+      >
+        <Icon name="search" size={15} />
+        <span class="label">검색</span>
+        <kbd class="kbd">⌘K</kbd>
+      </button>
+
+      <ThemeToggle client:load />
+
+      <a
+        class="icon-btn"
+        href={withBase('rss.xml')}
+        aria-label="RSS 피드"
+        title="RSS 피드"
+      >
+        <Icon name="rss" size={17} />
+      </a>
+    </div>
+  </div>
+</header>
+
+<nav class="mobile-nav" aria-label="모바일 메뉴">
+  {
+    site.nav.map((item) => (
+      <a
+        href={withBase(item.href)}
+        aria-current={isActivePath(currentPath, item.href) ? 'page' : undefined}
+      >
+        <Icon name={item.icon} size={19} />
+        <span>{item.label}</span>
+      </a>
+    ))
+  }
+</nav>
+
+<script>
+  // 스크롤 시 헤더에 유리 배경을 입힌다.
+  const syncHeader = () => {
+    const header = document.querySelector('[data-site-header]');
+    if (!header) return;
+    const apply = () => {
+      header.dataset.scrolled = String(window.scrollY > 8);
+    };
+    apply();
+    window.addEventListener('scroll', apply, { passive: true });
+  };
+
+  syncHeader();
+  document.addEventListener('astro:page-load', syncHeader);
+</script>

@@ -721,6 +721,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cloudflare/workers-types@npm:^4.20250109.0":
+  version: 4.20260702.1
+  resolution: "@cloudflare/workers-types@npm:4.20260702.1"
+  checksum: 6233d5c284da49103e795cc7e57ccd0a779416aa5bcb8dfac139aa7e23a70a0f4a946a5149d0ec7bd4b6c76aaede5202bcee9b09aa5c9bc0d553f3fb9be0d6b8
+  languageName: node
+  linkType: hard
+
 "@csstools/color-helpers@npm:^5.1.0":
   version: 5.1.0
   resolution: "@csstools/color-helpers@npm:5.1.0"
@@ -3539,6 +3546,7 @@ __metadata:
     "@tiptap/extension-underline": ^2.5.8
     "@tiptap/html": ^2.5.8
     "@tiptap/pm": ^2.5.8
+    "@tiptap/react": ^2.5.8
     "@types/dompurify": ^3.0.5
     "@types/node": ^20.11.30
     "@types/react": ^18.2.66
@@ -8760,6 +8768,10 @@ __metadata:
 "personal-blog@workspace:.":
   version: 0.0.0-use.local
   resolution: "personal-blog@workspace:."
+  dependencies:
+    "@cloudflare/workers-types": ^4.20250109.0
+    typescript: ^5.9.3
+    vitest: ^1.6.0
   languageName: unknown
   linkType: soft
 
@@ -10979,7 +10991,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.4.5":
+"typescript@npm:^5.4.5, typescript@npm:^5.9.3":
   version: 5.9.3
   resolution: "typescript@npm:5.9.3"
   bin:
@@ -10989,7 +11001,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^5.4.5#~builtin<compat/typescript>":
+"typescript@patch:typescript@^5.4.5#~builtin<compat/typescript>, typescript@patch:typescript@^5.9.3#~builtin<compat/typescript>":
   version: 5.9.3
   resolution: "typescript@patch:typescript@npm%3A5.9.3#~builtin<compat/typescript>::version=5.9.3&hash=ad5954"
   bin:

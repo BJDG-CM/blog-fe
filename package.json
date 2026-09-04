@@ -2,17 +2,23 @@
   "name": "personal-blog",
   "private": true,
   "version": "1.0.0",
-  "packageManager": "npm@10.5.0",
+  "packageManager": "yarn@3.3.1",
   "workspaces": [
     "site",
     "authoring"
   ],
   "scripts": {
-    "dev": "npm --workspace site run dev",
-    "author": "npm --workspace authoring run dev",
-    "build": "npm --workspace site run build",
-    "preview": "npm --workspace site run preview",
-    "lint": "npm --workspaces run lint",
-    "test": "npm --workspaces run test"
+    "dev": "yarn workspace blog-site dev",
+    "author": "yarn workspace blog-authoring dev",
+    "build": "yarn workspace blog-site build",
+    "preview": "yarn workspace blog-site preview",
+    "lint": "yarn workspace blog-site lint",
+    "test": "yarn workspace blog-site test && vitest run",
+    "typecheck": "yarn workspace blog-site exec tsc --noEmit && tsc --noEmit -p tsconfig.functions.json"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250109.0",
+    "typescript": "^5.9.3",
+    "vitest": "^1.6.0"
   }
 }

@@ -16,6 +16,8 @@ type Props = {
   items: SearchDoc[];
   nav: NavItem[];
   base: string;
+  /** 글 상세면 그 글의 슬러그. "이 글 편집" 항목이 생긴다. */
+  editSlug?: string;
 };
 
 type Result = {
@@ -93,10 +95,16 @@ function highlight(text: string, query: string) {
   );
 }
 
-export default function CommandPalette({ items, nav, base }: Props) {
+export default function CommandPalette({
+  items,
+  nav,
+  base,
+  editSlug,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
+  const [canEdit, setCanEdit] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -143,6 +151,16 @@ export default function CommandPalette({ items, nav, base }: Props) {
     };
   }, [open]);
 
+  // 편집 권한은 EditEntry 가 확인해 세션에 남겨둔 값을 그대로 쓴다.
+  useEffect(() => {
+    if (!open) return;
+    try {
+      setCanEdit(sessionStorage.getItem('blog-can-edit') === '1');
+    } catch {
+      setCanEdit(false);
+    }
+  }, [open]);
+
   // 열려 있는 동안 배경 스크롤을 잠근다.
   useEffect(() => {
     if (!open) return;
@@ -169,6 +187,20 @@ export default function CommandPalette({ items, nav, base }: Props) {
       .slice(0, 12);
   }, [items, query]);
 
+  const actions = useMemo(() => {
+    if (!canEdit) return [] as NavItem[];
+    const list: NavItem[] = [{ href: 'admin/?new=1', label: '새 글 쓰기' }];
+    if (editSlug) {
+      list.unshift({
+        href: `admin/?slug=${encodeURIComponent(editSlug)}`,
+        label: '이 글 편집',
+      });
+    }
+    if (!query.trim()) return list;
+    const q = norm(query);
+    return list.filter((item) => norm(item.label).includes(q));
+  }, [canEdit, editSlug, query]);
+
   const navResults = useMemo(() => {
     if (!query.trim()) return nav;
     const q = norm(query);
@@ -185,8 +217,12 @@ export default function CommandPalette({ items, nav, base }: Props) {
         key: `nav:${item.href}`,
         href: `${base}${item.href}`,
       })),
+      ...actions.map((item) => ({
+        key: `action:${item.href}`,
+        href: `${base}${item.href}`,
+      })),
     ],
-    [results, navResults, base],
+    [results, navResults, actions, base],
   );
 
   useEffect(() => {
@@ -348,6 +384,44 @@ export default function CommandPalette({ items, nav, base }: Props) {
                       >
                         <path d="M5 12h14" />
                         <path d="m13 6 6 6-6 6" />
+                      </svg>
+                    </span>
+                    <span className="text">
+                      <span className="title">{item.label}</span>
+                    </span>
+                  </a>
+                );
+              })}
+            </>
+          )}
+
+          {actions.length > 0 && (
+            <>
+              <div className="palette-group-label">편집</div>
+              {actions.map((item, index) => {
+                const flatIndex = results.length + navResults.length + index;
+                return (
+                  <a
+                    key={item.href}
+                    className="palette-item"
+                    href={`${base}${item.href}`}
+                    data-active={active === flatIndex}
+                    onMouseEnter={() => setActive(flatIndex)}
+                  >
+                    <span className="icon" aria-hidden="true">
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H16l4 4v13.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20.5Z" />
+                        <path d="M15 3v5h5" />
+                        <path d="M8.5 13h7M8.5 17h4" />
                       </svg>
                     </span>
                     <span className="text">

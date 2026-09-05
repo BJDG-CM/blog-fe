@@ -1,0 +1,95 @@
+---
+import Icon from './Icon.astro';
+import { withBase } from '../utils/url';
+
+type Props = {
+  /** 글 상세면 그 글의 슬러그. 없으면 새 글 쓰기로 연결된다. */
+  slug?: string;
+};
+
+const { slug } = Astro.props;
+
+const href = slug
+  ? `${withBase('admin/')}?slug=${encodeURIComponent(slug)}`
+  : `${withBase('admin/')}?new=1`;
+---
+
+{/* 로그인한 본인에게만 보인다. 방문자에게는 끝까지 숨겨진 채로 남는다. */}
+<a class="edit-fab" href={href} data-edit-fab hidden>
+  <Icon name="posts" size={16} />
+  <span>{slug ? '이 글 편집' : '새 글'}</span>
+  <kbd class="kbd">E</kbd>
+</a>
+
+<script>
+  const SESSION_KEY = 'blog-can-edit';
+
+  /**
+   * 편집 권한 확인.
+   *
+   * 사이트가 정적이라 서버가 로그인 여부를 알 수 없으므로 /api/me 를 한 번
+   * 물어본다. 로그인하지 않았다면 Access 가 로그인 페이지로 302 를 주는데,
+   * redirect: 'manual' 로 따라가지 않아야 CORS 오류가 나지 않는다.
+   * 결과는 세션 동안 캐시해 페이지마다 다시 묻지 않는다.
+   */
+  const canEdit = async () => {
+    try {
+      const cached = sessionStorage.getItem(SESSION_KEY);
+      if (cached !== null) return cached === '1';
+    } catch {
+      // 스토리지를 못 쓰는 환경이면 그냥 매번 확인한다.
+    }
+
+    let ok = false;
+    try {
+      const response = await fetch('/api/me', {
+        redirect: 'manual',
+        credentials: 'same-origin',
+      });
+      ok = response.ok;
+    } catch {
+      ok = false;
+    }
+
+    try {
+      sessionStorage.setItem(SESSION_KEY, ok ? '1' : '0');
+    } catch {
+      // 무시
+    }
+    return ok;
+  };
+
+  const setup = async () => {
+    const fab = document.querySelector('[data-edit-fab]');
+    if (!fab) return;
+    if (!(await canEdit())) return;
+
+    fab.removeAttribute('hidden');
+
+    if (document.body.dataset.editKeyBound !== 'true') {
+      document.body.dataset.editKeyBound = 'true';
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key !== 'e' || event.metaKey || event.ctrlKey || event.altKey) {
+          return;
+        }
+        const target = event.target;
+        const typing =
+          target instanceof HTMLElement &&
+          (target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.isContentEditable);
+        if (typing) return;
+
+        const current = document.querySelector('[data-edit-fab]');
+        if (current && !current.hasAttribute('hidden')) {
+          event.preventDefault();
+          window.location.href = current.getAttribute('href') || '';
+        }
+      });
+    }
+  };
+
+  setup();
+  document.addEventListener('astro:page-load', setup);
+</script>

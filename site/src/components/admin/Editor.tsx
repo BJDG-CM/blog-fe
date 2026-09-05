@@ -97,8 +97,12 @@ export default function Editor() {
   const [current, setCurrent] = useState<LoadedPost | null>(null);
   const [status, setStatus] = useState<Status>({ kind: 'idle' });
   const [dirty, setDirty] = useState(false);
+  /** 새 글에서 직접 입력한 주소. 비우면 제목에서 만든다. */
+  const [slugDraft, setSlugDraft] = useState('');
 
   const fileInput = useRef<HTMLInputElement>(null);
+  const openRef = useRef<((slug: string) => Promise<void>) | null>(null);
+  const newRef = useRef<(() => void) | null>(null);
 
   const editor = useEditor({
     extensions,
@@ -139,6 +143,17 @@ export default function Editor() {
       } catch {
         if (!cancelled) setAuthFailed(true);
       }
+
+      if (cancelled) return;
+
+      // 글을 읽다가 편집 버튼으로 들어온 경우 해당 글을 바로 연다.
+      const params = new URLSearchParams(window.location.search);
+      const wanted = params.get('slug');
+      if (wanted) {
+        await openRef.current?.(wanted);
+      } else if (params.has('new')) {
+        newRef.current?.();
+      }
     })();
 
     return () => {
@@ -165,6 +180,7 @@ export default function Editor() {
         if (!response.ok) throw new Error((await response.json()).error);
         const body = (await response.json()) as LoadedPost;
         setCurrent(body);
+        setSlugDraft('');
         editor?.commands.setContent(body.doc ?? emptyDoc);
         setDirty(false);
         setStatus({ kind: 'idle' });
@@ -185,10 +201,14 @@ export default function Editor() {
       doc: emptyDoc,
       sha: '',
     });
+    setSlugDraft('');
     editor?.commands.setContent(emptyDoc);
     setDirty(false);
     setStatus({ kind: 'idle' });
   }, [dirty, editor]);
+
+  openRef.current = openPost;
+  newRef.current = startNew;
 
   /* ---------------------------------------------------------------
      저장
@@ -210,7 +230,8 @@ export default function Editor() {
       return;
     }
 
-    const slug = current.slug || slugify(title);
+    // 기존 글은 주소를 유지한다. 새 글만 직접 입력값 → 제목 순으로 정한다.
+    const slug = current.slug || slugify(slugDraft.trim() || title);
     setStatus({ kind: 'busy', text: '저장하는 중…' });
 
     try {
@@ -244,7 +265,7 @@ export default function Editor() {
     } catch (error) {
       setStatus({ kind: 'error', text: (error as Error).message });
     }
-  }, [current, editor, loadList]);
+  }, [current, editor, loadList, slugDraft]);
 
   const unpublish = useCallback(async () => {
     if (!current?.slug) return;
@@ -280,7 +301,8 @@ export default function Editor() {
   const uploadImage = useCallback(
     async (file: File) => {
       if (!current || !editor) return;
-      const slug = current.slug || slugify(current.meta.title || 'draft');
+      const slug =
+        current.slug || slugify(slugDraft.trim() || current.meta.title || 'draft');
 
       setStatus({ kind: 'busy', text: '이미지 올리는 중…' });
       try {
@@ -305,7 +327,7 @@ export default function Editor() {
         setStatus({ kind: 'error', text: (error as Error).message });
       }
     },
-    [current, editor],
+    [current, editor, slugDraft],
   );
 
   // ⌘S / Ctrl+S 로 저장
@@ -427,6 +449,29 @@ export default function Editor() {
                 />
               </label>
 
+              <label className="block">
+                <span>
+                  주소 (slug)
+                  {current.slug
+                    ? ' — 발행된 글은 링크가 깨지지 않도록 고정됩니다'
+                    : ' — 비우면 제목에서 자동으로 만듭니다'}
+                </span>
+                {current.slug ? (
+                  <input value={current.slug} readOnly disabled />
+                ) : (
+                  <input
+                    value={slugDraft}
+                    onChange={(event) => setSlugDraft(event.target.value)}
+                    placeholder={
+                      current.meta.title
+                        ? slugify(current.meta.title)
+                        : 'good-code'
+                    }
+                    spellCheck={false}
+                  />
+                )}
+              </label>
+
               <div className="admin-toggles">
                 <label className="row">
                   <input
@@ -448,9 +493,9 @@ export default function Editor() {
                   />
                   홈 대표 글
                 </label>
-                {current.slug && (
-                  <span className="admin-slug">/posts/{current.slug}</span>
-                )}
+                <span className="admin-slug">
+                  /posts/{current.slug || slugify(slugDraft.trim() || current.meta.title || '')}
+                </span>
               </div>
             </div>
 

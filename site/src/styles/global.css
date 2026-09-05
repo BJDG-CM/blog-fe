@@ -1940,3 +1940,46 @@ a.tag:hover {
 @view-transition {
   navigation: auto;
 }
+
+/* ---------------------------------------------------------------
+   편집 진입점 (로그인한 본인에게만 노출)
+   --------------------------------------------------------------- */
+.edit-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 72px;
+  z-index: 41;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding-inline: 15px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--bg-elevated) 88%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--fg);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  box-shadow: var(--shadow-md);
+  animation: fade-up 0.35s var(--ease) both;
+  transition: border-color 0.18s var(--ease), transform 0.18s var(--ease);
+}
+.edit-fab:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+.edit-fab .kbd {
+  margin-left: 2px;
+}
+
+@media (max-width: 860px) {
+  .edit-fab {
+    bottom: 128px;
+  }
+  .edit-fab .kbd {
+    display: none;
+  }
+}

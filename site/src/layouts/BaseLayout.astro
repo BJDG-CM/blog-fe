@@ -7,6 +7,7 @@ import SEO from '../components/SEO.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
+import EditEntry from '../components/EditEntry.astro';
 import CommandPalette from '../components/CommandPalette';
 import '../styles/global.css';
 
@@ -21,6 +22,10 @@ type Props = {
   showProgress?: boolean;
   /** 검색 엔진에서 감출 페이지 */
   noindex?: boolean;
+  /** 글 상세면 그 글의 슬러그. 편집 진입점이 이 글을 바로 연다. */
+  editSlug?: string;
+  /** 편집 화면 자신에는 편집 버튼을 띄우지 않는다. */
+  hideEditEntry?: boolean;
 };
 
 const {
@@ -32,6 +37,8 @@ const {
   tags = [],
   showProgress = false,
   noindex = false,
+  editSlug,
+  hideEditEntry = false,
 } = Astro.props;
 
 const searchIndex = buildSearchIndex();
@@ -113,6 +120,8 @@ const base = withBase('');
 
     <Footer />
 
+    {!hideEditEntry && <EditEntry slug={editSlug} />}
+
     <button type="button" class="to-top" data-to-top aria-label="맨 위로">
       <Icon name="arrowUp" size={17} />
     </button>
@@ -122,6 +131,7 @@ const base = withBase('');
       items={searchIndex}
       nav={paletteNav}
       base={base}
+      editSlug={editSlug}
     />
 
     <script>

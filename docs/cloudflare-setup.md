@@ -33,6 +33,7 @@ master 푸시 ──▶ GitHub Actions ──▶ 검사 → 빌드 → wrangler 
 | 커스텀 도메인 | `blog.yejunlee.com` |
 | 배포 방식 | Direct upload (GitHub Actions 에서 업로드) |
 | 프로덕션 브랜치 | `master` |
+| DNS | `blog` CNAME → `blog-fe-ddv.pages.dev` (프록시 켜짐) |
 
 Git 연결형이 아니라 **direct upload** 프로젝트입니다. 빌드는 GitHub Actions 가
 맡고, `wrangler pages deploy` 로 결과물만 올립니다. 덕분에 배포 전에 lint ·
@@ -81,7 +82,7 @@ Pages 프로젝트 → **Settings → Variables and Secrets** (Production).
 | `GITHUB_BRANCH` | Text | `master` |
 | `GIT_AUTHOR_NAME` | Text | 커밋에 남길 이름 |
 | `GIT_AUTHOR_EMAIL` | Text | 커밋에 남길 이메일 |
-| `CF_ACCESS_TEAM_DOMAIN` | Text | `<팀이름>.cloudflareaccess.com` |
+| `CF_ACCESS_TEAM_DOMAIN` | Text | `winter-snow-cbb8.cloudflareaccess.com` |
 | `CF_ACCESS_AUD` | Text | Access 애플리케이션의 AUD 태그 |
 
 ### GitHub 토큰
@@ -104,11 +105,13 @@ Zero Trust → **Access → Applications → Self-hosted**
 | 항목 | 값 |
 | --- | --- |
 | Application name | `blog admin` |
-| Domain | `blog.yejunlee.com` |
-| Path | `admin` 과 `api` |
+| Type | Self-hosted |
+| Destinations | `blog.yejunlee.com/admin`, `blog.yejunlee.com/api` |
+| Session duration | 24h |
 
-경로를 두 개 등록해 **하나의 애플리케이션**으로 두는 편이 좋습니다. 그래야
-AUD 태그가 하나라 `CF_ACCESS_AUD` 도 하나로 끝납니다.
+경로 두 개를 **하나의 애플리케이션**에 등록했습니다. 그래야 AUD 태그가 하나라
+`CF_ACCESS_AUD` 도 하나로 끝납니다. 팀 도메인은
+`winter-snow-cbb8.cloudflareaccess.com` 입니다.
 
 정책은 이렇게 둡니다.
 
@@ -130,8 +133,15 @@ AUD 태그가 하나라 `CF_ACCESS_AUD` 도 하나로 끝납니다.
 2. `https://blog.yejunlee.com/admin` — Cloudflare 로그인 화면이 떠야 합니다
 3. 로그인 후 글을 고쳐 저장 → 저장소에 커밋이 생기고, 재배포 후 반영
 
-`curl https://blog.yejunlee.com/api/me` 가 로그인 없이 401/403 을 주면 정상이고,
-`500` 과 함께 Access 설정 안내가 오면 3번 표의 환경 변수가 빠진 상태입니다.
+로그인하지 않은 상태에서 기대되는 응답입니다.
+
+```
+/  /posts/  /rss.xml  /robots.txt   200
+/admin/  /api/*                     302 → winter-snow-cbb8.cloudflareaccess.com
+```
+
+`/api/*` 가 `500` 과 함께 Access 설정 안내를 주면 3번 표의 환경 변수가 빠진
+상태이고, `200` 을 주면 Access 애플리케이션 경로가 잘못된 것입니다.
 
 문제가 생기면 Pages 프로젝트의 **Functions → Real-time Logs** 에서 `/api/*`
 요청의 오류 메시지를 볼 수 있습니다.

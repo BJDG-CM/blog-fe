@@ -1,0 +1,51 @@
+name: Deploy Cloudflare Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: cloudflare-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: node .yarn/releases/yarn-3.3.1.cjs install --no-immutable
+
+      - name: Check
+        run: |
+          node .yarn/releases/yarn-3.3.1.cjs lint
+          node .yarn/releases/yarn-3.3.1.cjs typecheck
+          node .yarn/releases/yarn-3.3.1.cjs test
+
+      - name: Build site
+        env:
+          PUBLIC_SITE_URL: https://blog.yejunlee.com
+          PUBLIC_BASE_PATH: "/"
+          PUBLIC_PRIVATE_MODE: "${{ vars.PRIVATE_MODE || 'false' }}"
+          PRIVATE_PASSPHRASE: "${{ secrets.PRIVATE_PASSPHRASE }}"
+        run: node .yarn/releases/yarn-3.3.1.cjs workspace blog-site build
+
+      # functions/ 는 저장소 루트에 있으므로 여기서 함께 번들된다.
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy site/dist
+            --project-name blog-fe
+            --branch master
+            --commit-dirty=true

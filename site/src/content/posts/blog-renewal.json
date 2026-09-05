@@ -3,16 +3,22 @@
   "meta": {
     "title": "블로그를 새로 단장했습니다",
     "date": "2026-09-04",
-    "tags": ["astro", "design", "frontend"],
+    "tags": [
+      "astro",
+      "design",
+      "frontend"
+    ],
     "summary": "커맨드 팔레트 검색, 목차, 코드 하이라이팅, 다크 모드까지. 정적 블로그에 필요한 편의 기능을 한 번에 정리한 리뉴얼 기록입니다.",
-    "featured": true,
-    "draft": false
+    "featured": true
   },
   "doc": {
     "type": "doc",
     "content": [
       {
         "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
         "content": [
           {
             "type": "text",
@@ -22,14 +28,36 @@
       },
       {
         "type": "heading",
-        "attrs": { "level": 2 },
-        "content": [{ "type": "text", "text": "무엇이 달라졌나" }]
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "무엇이 달라졌나"
+          }
+        ]
       },
       {
         "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
         "content": [
-          { "type": "text", "text": "가장 크게 바뀐 건 " },
-          { "type": "text", "text": "탐색", "marks": [{ "type": "bold" }] },
+          {
+            "type": "text",
+            "text": "가장 크게 바뀐 건 "
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "bold"
+              }
+            ],
+            "text": "탐색"
+          },
           {
             "type": "text",
             "text": " 입니다. 어느 페이지에서든 단축키 한 번으로 제목·태그·본문까지 훑어볼 수 있게 했습니다."
@@ -44,11 +72,18 @@
             "content": [
               {
                 "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
                 "content": [
                   {
                     "type": "text",
-                    "text": "커맨드 팔레트",
-                    "marks": [{ "type": "bold" }]
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "커맨드 팔레트"
                   },
                   {
                     "type": "text",
@@ -63,11 +98,18 @@
             "content": [
               {
                 "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
                 "content": [
                   {
                     "type": "text",
-                    "text": "글 목록 필터",
-                    "marks": [{ "type": "bold" }]
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "글 목록 필터"
                   },
                   {
                     "type": "text",
@@ -82,11 +124,18 @@
             "content": [
               {
                 "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
                 "content": [
                   {
                     "type": "text",
-                    "text": "목차와 진행률",
-                    "marks": [{ "type": "bold" }]
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "목차와 진행률"
                   },
                   {
                     "type": "text",
@@ -101,11 +150,18 @@
             "content": [
               {
                 "type": "paragraph",
+                "attrs": {
+                  "textAlign": null
+                },
                 "content": [
                   {
                     "type": "text",
-                    "text": "관련 글과 이전·다음 글",
-                    "marks": [{ "type": "bold" }]
+                    "marks": [
+                      {
+                        "type": "bold"
+                      }
+                    ],
+                    "text": "관련 글과 이전·다음 글"
                   },
                   {
                     "type": "text",
@@ -119,16 +175,35 @@
       },
       {
         "type": "heading",
-        "attrs": { "level": 2 },
-        "content": [{ "type": "text", "text": "읽는 화면 다듬기" }]
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "읽는 화면 다듬기"
+          }
+        ]
       },
       {
         "type": "heading",
-        "attrs": { "level": 3 },
-        "content": [{ "type": "text", "text": "타이포그래피와 테마" }]
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "타이포그래피와 테마"
+          }
+        ]
       },
       {
         "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
         "content": [
           {
             "type": "text",
@@ -138,6 +213,9 @@
       },
       {
         "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
         "content": [
           {
             "type": "text",
@@ -147,11 +225,22 @@
       },
       {
         "type": "heading",
-        "attrs": { "level": 3 },
-        "content": [{ "type": "text", "text": "코드 블록" }]
+        "attrs": {
+          "textAlign": null,
+          "level": 3
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "코드 블록"
+          }
+        ]
       },
       {
         "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
         "content": [
           {
             "type": "text",
@@ -161,7 +250,9 @@
       },
       {
         "type": "codeBlock",
-        "attrs": { "language": "typescript" },
+        "attrs": {
+          "language": "typescript"
+        },
         "content": [
           {
             "type": "text",
@@ -171,6 +262,9 @@
       },
       {
         "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
         "content": [
           {
             "type": "text",
@@ -180,11 +274,22 @@
       },
       {
         "type": "heading",
-        "attrs": { "level": 2 },
-        "content": [{ "type": "text", "text": "구조는 그대로" }]
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "구조는 그대로"
+          }
+        ]
       },
       {
         "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
         "content": [
           {
             "type": "text",
@@ -200,28 +305,67 @@
             "content": [
               {
                 "type": "tableHeader",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null
+                },
                 "content": [
                   {
                     "type": "paragraph",
-                    "content": [{ "type": "text", "text": "영역" }]
+                    "attrs": {
+                      "textAlign": null
+                    },
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "영역"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "type": "tableHeader",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null
+                },
                 "content": [
                   {
                     "type": "paragraph",
-                    "content": [{ "type": "text", "text": "사용 기술" }]
+                    "attrs": {
+                      "textAlign": null
+                    },
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "사용 기술"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "type": "tableHeader",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null
+                },
                 "content": [
                   {
                     "type": "paragraph",
-                    "content": [{ "type": "text", "text": "비고" }]
+                    "attrs": {
+                      "textAlign": null
+                    },
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "비고"
+                      }
+                    ]
                   }
                 ]
               }
@@ -232,27 +376,61 @@
             "content": [
               {
                 "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null
+                },
                 "content": [
                   {
                     "type": "paragraph",
-                    "content": [{ "type": "text", "text": "사이트" }]
+                    "attrs": {
+                      "textAlign": null
+                    },
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "사이트"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null
+                },
                 "content": [
                   {
                     "type": "paragraph",
-                    "content": [{ "type": "text", "text": "Astro + React 아일랜드" }]
+                    "attrs": {
+                      "textAlign": null
+                    },
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Astro + React 아일랜드"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null
+                },
                 "content": [
                   {
                     "type": "paragraph",
+                    "attrs": {
+                      "textAlign": null
+                    },
                     "content": [
                       {
                         "type": "text",
@@ -269,28 +447,67 @@
             "content": [
               {
                 "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null
+                },
                 "content": [
                   {
                     "type": "paragraph",
-                    "content": [{ "type": "text", "text": "작성" }]
+                    "attrs": {
+                      "textAlign": null
+                    },
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "작성"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null
+                },
                 "content": [
                   {
                     "type": "paragraph",
-                    "content": [{ "type": "text", "text": "Tiptap 로컬 에디터" }]
+                    "attrs": {
+                      "textAlign": null
+                    },
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "Tiptap 로컬 에디터"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null
+                },
                 "content": [
                   {
                     "type": "paragraph",
-                    "content": [{ "type": "text", "text": "JSON으로 저장 후 커밋" }]
+                    "attrs": {
+                      "textAlign": null
+                    },
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "JSON으로 저장 후 커밋"
+                      }
+                    ]
                   }
                 ]
               }
@@ -301,28 +518,67 @@
             "content": [
               {
                 "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null
+                },
                 "content": [
                   {
                     "type": "paragraph",
-                    "content": [{ "type": "text", "text": "배포" }]
+                    "attrs": {
+                      "textAlign": null
+                    },
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "배포"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null
+                },
                 "content": [
                   {
                     "type": "paragraph",
-                    "content": [{ "type": "text", "text": "GitHub Actions → Pages" }]
+                    "attrs": {
+                      "textAlign": null
+                    },
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "GitHub Actions → Pages"
+                      }
+                    ]
                   }
                 ]
               },
               {
                 "type": "tableCell",
+                "attrs": {
+                  "colspan": 1,
+                  "rowspan": 1,
+                  "colwidth": null
+                },
                 "content": [
                   {
                     "type": "paragraph",
-                    "content": [{ "type": "text", "text": "푸시하면 자동 배포" }]
+                    "attrs": {
+                      "textAlign": null
+                    },
+                    "content": [
+                      {
+                        "type": "text",
+                        "text": "푸시하면 자동 배포"
+                      }
+                    ]
                   }
                 ]
               }
@@ -335,6 +591,9 @@
         "content": [
           {
             "type": "paragraph",
+            "attrs": {
+              "textAlign": null
+            },
             "content": [
               {
                 "type": "text",
@@ -346,11 +605,22 @@
       },
       {
         "type": "heading",
-        "attrs": { "level": 2 },
-        "content": [{ "type": "text", "text": "앞으로" }]
+        "attrs": {
+          "textAlign": null,
+          "level": 2
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "앞으로"
+          }
+        ]
       },
       {
         "type": "paragraph",
+        "attrs": {
+          "textAlign": null
+        },
         "content": [
           {
             "type": "text",
